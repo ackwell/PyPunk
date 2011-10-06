@@ -129,11 +129,8 @@ class Ship(Entity):
 		if alien:
 			self.shipDie.Play()
 			self.world.remove(alien)
-			self.visible = False
-			self.collideable = False
-			HUD.gameOver = True
-		if not self.visible and self.shipDie.GetStatus() == 0:
 			self.world.remove(self)
+			HUD.gameOver = True
 	
 	def removed(self):
 		#although not always neccesary, generally good idea just in case
@@ -163,12 +160,8 @@ class Alien(Entity):
 		if bullet:
 			self.alienDie.Play()
 			self.world.remove(bullet)
-			self.visible = False
-			self.collidable = False
-			HUD.score += 1
-		
-		if not self.visible and self.alienDie.GetStatus() == 0:
 			self.world.remove(self)
+			HUD.score += 1
 
 		if self.x < -40:
 			self.world.remove(self)
