@@ -6,6 +6,7 @@ class Sfx(sf.Sound):
 		loc: loaction of sound file"""
 		sf.Sound.__init__(self)
 		self.SetBuffer(GetSound(loc))
+		sfxList.append(self)
 
 class Music(sf.Music):
 	def __init__(self, loc):
@@ -13,6 +14,15 @@ class Music(sf.Music):
 		loc: location of music file"""
 		sf.Music.__init__(self)
 		self.OpenFromFile(loc)
+
+#This is just used to make sure sounds finish playing before being GC'D
+sfxList = []
+def checkSounds():
+	for sfx in sfxList:
+		try:
+			if not sfx.im_self.world and sfx.GetStatus() == 0:
+				sfxList.remove(sfx)
+		except AttributeError: pass
 	
 soundCache = {}
 def GetSound(loc):

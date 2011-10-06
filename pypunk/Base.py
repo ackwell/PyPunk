@@ -1,5 +1,5 @@
 from PySFML import sf
-import Punk, Event
+import Punk, Event, Audio
 
 #Base class, handles window initiation, etc.
 class Engine(object):
@@ -59,6 +59,7 @@ class Engine(object):
 			if self.World:
 				self.World.update(self.App)
 			self.App.Display()
+			Audio.checkSounds()
 			self.World.endOfFrame()
 	
 	#Vars
