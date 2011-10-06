@@ -136,7 +136,6 @@ class Ship(Entity):
 		#although not always neccesary, generally good idea just in case
 		DeregisterEvent(Event.KeyReleased, self.onRelease)
 		DeregisterEvent(Event.KeyPressed, self.onPressed)
-		
 
 class Alien(Entity):
 	speed = 200

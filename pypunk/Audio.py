@@ -6,7 +6,11 @@ class Sfx(sf.Sound):
 		loc: loaction of sound file"""
 		sf.Sound.__init__(self)
 		self.SetBuffer(GetSound(loc))
-		sfxList.append(self)
+		
+	def __del__(self):
+		if not self.GetStatus() == 0:
+			try: sfxList.append(self)
+			except AttributeError: pass
 
 class Music(sf.Music):
 	def __init__(self, loc):
@@ -20,9 +24,9 @@ sfxList = []
 def checkSounds():
 	for sfx in sfxList:
 		try:
-			if not sfx.im_self.world and sfx.GetStatus() == 0:
+			if sfx.GetStatus() == 0:
 				sfxList.remove(sfx)
-		except AttributeError: pass
+		except AttributeError: print "bet i'll see this"
 	
 soundCache = {}
 def GetSound(loc):
