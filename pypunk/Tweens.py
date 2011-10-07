@@ -56,7 +56,7 @@ class Tween():
 			self._t = self._ease(self._t)
 		if self._time >= self._target:
 			self._t = 1
-			self._finish = True
+			self.finish()
 	
 	def start(self):
 		self._time = 0

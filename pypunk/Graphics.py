@@ -12,8 +12,13 @@ class Image(sf.Sprite):
 	def __init__(self, loc, rect=None):
 		"""Create new Image
 		Args:
-		loc: location of image"""
-		self.img = GetImage(loc)
+		loc: location of image / sf.Image instance"""
+		if type(loc) == str:
+			self.img = GetImage(loc)
+		elif type(loc) == sf.Image:
+			self.img = loc
+		else:
+			raise TypeError("Please pass the path to an image or a sf.Image instance")
 		sf.Sprite.__init__(self, self.img)
 
 		#Sprite.SetSubRect(sf::IntRect(10, 10, 20, 20));
@@ -25,11 +30,19 @@ class Image(sf.Sprite):
 		self.y = 0
 
 		self.visible = True
-	
+
+		self._alpha = 1.0
+
 	def render(self, App, pos=(0, 0)):
 		"""Render the image to App"""
 		self.SetPosition(int(self.x+pos[0]), int(self.y+pos[1]))
 		if self.visible: App.Draw(self)
+	
+	def set_alpha(self, value):
+		if value > 1: value = 1
+		self._alpha = value
+		self.SetColor(sf.Color(255, 255, 255, int(value*255)))
+	alpha = property(lambda self: self._alpha, set_alpha)
 
 class Shape(sf.Shape):
 	def __init__(self):
@@ -37,6 +50,7 @@ class Shape(sf.Shape):
 		sf.Shape.__init__(self)
 		self.x = 0
 		self.y = 0
+		self._alpha = 1.0
 	
 	def createRect(self, width, height, colour):
 		"""Predefined rectangle shape"""
@@ -48,6 +62,12 @@ class Shape(sf.Shape):
 	def render(self, App, pos=(0, 0)):
 		self.SetPosition(int(self.x+pos[0]), int(self.y+pos[1]))
 		App.Draw(self)
+	
+	def set_alpha(self, value):
+		if value > 1: value = 1
+		self._alpha = value
+		self.SetColor(sf.Color(255, 255, 255, int(value*255)))
+	alpha = property(lambda self: self._alpha, set_alpha)
 
 class Text(sf.String):
 	def __init__(self, loc, text="", size=16):
@@ -60,6 +80,7 @@ class Text(sf.String):
 
 		self.x = 0
 		self.y = 0
+		self._alpha = 1.0
 
 		sf.String.__init__(self)
 		self.SetText(text)
@@ -79,6 +100,12 @@ class Text(sf.String):
 
 	def set_size(self, value): self.SetSize(value)
 	size = property(lambda self: self.GetSize(), set_size)
+
+	def set_alpha(self, value):
+		if value > 1: value = 1
+		self._alpha = value
+		self.SetColor(sf.Color(255, 255, 255, int(value*255)))
+	alpha = property(lambda self: self._alpha, set_alpha)
 	
 	def render(self, App, pos=(0, 0)):
 		self.SetPosition(int(self.x+pos[0]), int(self.y+pos[1]))
