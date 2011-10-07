@@ -224,6 +224,10 @@ class Entity(object):
 	def addTween(self, tween):
 		"""Add a tween to update"""
 		self.tweens.append(tween)
+		tween._parent = self
+	
+	def removeTween(self, tween):
+		self.tweens.remove(tween)
 
 	def updateTweens(self):
 		for tween in self.tweens:
