@@ -241,7 +241,8 @@ class Entity(object):
 	
 	def render(self, App):
 		"""Render graphic"""
-		self.graphic.render(App, (self.x, self.y))
+		if self.graphic and self.visible:
+			self.graphic.render(App, (self.x, self.y))
 	
 	def collide(self, type, x, y):
 		"""Check for collision

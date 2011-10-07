@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os, sys
+pypunk_path = os.path.abspath('../..')
+sys.path.append(os.path.join(pypunk_path))
+
 from pypunk.Base import *
 from pypunk.Graphics import *
 from pypunk.Tweens import *
