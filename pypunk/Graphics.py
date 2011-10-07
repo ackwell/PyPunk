@@ -3,22 +3,33 @@ from PySFML import sf
 #Reference to colour
 Color = sf.Color
 
+class Rectangle:
+	def __init__(self, x, y, width, height):
+		self.x = x; self.y = y;
+		self.width = width; self.height = height;
+
 class Image(sf.Sprite):
-	def __init__(self, loc):
+	def __init__(self, loc, rect=None):
 		"""Create new Image
 		Args:
 		loc: location of image"""
 		self.img = GetImage(loc)
 		sf.Sprite.__init__(self, self.img)
 
+		#Sprite.SetSubRect(sf::IntRect(10, 10, 20, 20));
+		if rect:
+			self.SetSubRect(sf.IntRect(rect.x, rect.y, rect.x+rect.width, rect.y+rect.height))
+
 		#Positions for drawing (relative to parent object)
 		self.x = 0
 		self.y = 0
+
+		self.visible = True
 	
 	def render(self, App, pos=(0, 0)):
 		"""Render the image to App"""
 		self.SetPosition(int(self.x+pos[0]), int(self.y+pos[1]))
-		App.Draw(self)
+		if self.visible: App.Draw(self)
 
 class Shape(sf.Shape):
 	def __init__(self):

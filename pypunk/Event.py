@@ -4,14 +4,53 @@ from PySFML import sf
 Key = sf.Key
 Event = sf.Event
 
+class Input:
+	#Structure - 
+	#Keycode:[Pressed, Released, Down]
+	keyRegister = {}
+
+	@classmethod
+	def onPressed(self, args):
+		#Check if registered
+		try: key = self.keyRegister[args["Code"]]
+		except KeyError: key = self.keyRegister[args["Code"]] = [False, False, False]
+
+		if not key[2]:
+			key[0] = key[2] = True
+	
+	@classmethod
+	def onReleased(self, args):
+		key = self.keyRegister[args["Code"]]
+		key[1] = True; key[2] = False
+	
+	@classmethod
+	def ClearVars(self):
+		for v in self.keyRegister.itervalues():
+			v[0] = v[1] = False
+	
+	@classmethod
+	def check(self, key):
+		try: return self.keyRegister[key][2]
+		except KeyError: return False
+	
+	@classmethod
+	def pressed(self, key):
+		try: return self.keyRegister[key][0]
+		except KeyError: return False
+	
+	@classmethod
+	def released(self, key):
+		try: return self.keyRegister[key][1]
+		except KeyError: return False
+
 Register = {
 sf.Event.Closed:[],
 sf.Event.Resized:[],
 sf.Event.LostFocus:[],
 sf.Event.GainedFocus:[],
 sf.Event.TextEntered:[],
-sf.Event.KeyPressed:[],
-sf.Event.KeyReleased:[],
+sf.Event.KeyPressed:[Input.onPressed],
+sf.Event.KeyReleased:[Input.onReleased],
 sf.Event.MouseWheelMoved:[],
 sf.Event.MouseButtonPressed:[],
 sf.Event.MouseButtonReleased:[],
@@ -74,5 +113,4 @@ def DispatchEvents(App):
 					r.remove(func)
 			except AttributeError: #Otherwise just call it
 				func(args)
-		
 

@@ -7,6 +7,9 @@ def SetWorld(world):
 	if Engine.World: Engine.WorldChanged()
 	Engine.World = world
 
+def SetBGColor(r, g, b):
+	Engine.bgColor = (r, g, b)
+
 #Timing
 elapsed = 0
 FPS = 0

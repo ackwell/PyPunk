@@ -54,13 +54,13 @@ class Engine(object):
 		"""Start the engine"""
 		while self.App.IsOpened():
 			self.UpdateVars()
+			Event.Input.ClearVars()
 			self.App.Clear(self._bgColour)
 			Event.DispatchEvents(self.App)
-			if self.World:
-				self.World.update(self.App)
+			if self.World: self.World.update(self.App)
 			self.App.Display()
 			Audio.checkSounds()
-			self.World.endOfFrame()
+			if self.World: self.World.endOfFrame()
 	
 	#Vars
 	def UpdateVars(self):
@@ -165,7 +165,7 @@ class World(object):
 
 
 class Entity(object):
-	def __init__(self, x=0, y=0):
+	def __init__(self, x=0, y=0, graphic = None):
 		"""Creates new Entity object
 		Args:
 		x: Initial x position of entity
@@ -182,7 +182,7 @@ class Entity(object):
 		self.collidable = True
 
 		#Graphics
-		self.graphic = None
+		self.graphic = graphic
 		self.visible = True
 
 		#Should be updated
