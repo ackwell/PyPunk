@@ -10,7 +10,7 @@ from pypunk.Graphics import *
 from pypunk.Tweens import *
 from pypunk.Event import *
 from pypunk.Audio import *
-from pypunk import Punk
+from pypunk.Punk import *
 import math, random
 
 def start():
@@ -21,7 +21,7 @@ def start():
 	e.bgColor = (194, 194, 194)
 
 	#Set world
-	Punk.SetWorld( GameRoom())
+	Punk.world = GameRoom()
 
 	#Start the engine
 	e.Begin()
@@ -39,13 +39,13 @@ class GameRoom(World):
 
 		self.resetSpawnTimer()
 	
-	def update(self, App):
+	def update(self):
 		self.spawnTimer -= Punk.elapsed
 		if self.spawnTimer < 0:
 			self.spawnAlien()
 			self.resetSpawnTimer()
 
-		World.update(self, App)
+		World.update(self)
 	
 	def spawnAlien(self):
 		x = Punk.Engine.width

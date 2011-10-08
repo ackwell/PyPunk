@@ -1,5 +1,6 @@
 from PySFML import sf
-import Punk, Event, Audio
+from Punk import *
+import Event, Audio
 
 #Base class, handles window initiation, etc.
 class Engine(object):
@@ -57,7 +58,7 @@ class Engine(object):
 			Event.Input.ClearVars()
 			self.App.Clear(self._bgColour)
 			Event.DispatchEvents(self.App)
-			if self.World: self.World.update(self.App)
+			if self.World: self.World.update()
 			self.App.Display()
 			Audio.checkSounds()
 			if self.World: self.World.endOfFrame()
@@ -102,7 +103,7 @@ class World(object):
 		self.active = True
 		self.visible = True
 	
-	def update(self, App):
+	def update(self):
 		"""Called every frame. Updates Entities that have been added"""
 		#Loop through layers highest->lowest
 		for layer in sorted(self._layerList.iterkeys(), reverse=True):
@@ -113,7 +114,7 @@ class World(object):
 					object.updateTweens()
 					object.update()
 				if object.visible and self.visible:
-					object.render(App)
+					object.render()
 					
 	def add(self, toAdd):
 		"""Add a new Entity to the world"""
@@ -160,7 +161,8 @@ class World(object):
 		except KeyError: self._typeList[e.type] = []
 		self._typeList[e.type].append(e)
 	def remLayer(self, e):
-		self._layerList[e.layer].remove(e)
+		try: self._layerList[e.layer].remove(e)
+		except ValueError: print "Could not remove "+str(e)+" from layerList ("+str(self._layerList)+")"
 	def remType(self, e):
 		if e.type:
 			self._typeList[e.type].remove(e)
@@ -201,10 +203,6 @@ class Entity(object):
 
 		self.tweens = []
 
-	
-	def get_layer(self):
-		"""Get/set the layer of the entity"""
-		return self._layer
 	def set_layer(self, value):
 		#If has not been added to world yet
 		if not self.world:
@@ -214,11 +212,8 @@ class Entity(object):
 			self.world.remLayer(self)
 			self._layer = value
 			self.world.addLayer(self)
-	layer = property(get_layer, set_layer)
+	layer = property(lambda self: self._layer, set_layer)
 	
-	def get_type(self):
-		"""Get/set the type of the entity (for collisions)"""
-		return self._type
 	def set_type(self, value):
 		if not self.world:
 			self._type = value
@@ -226,7 +221,7 @@ class Entity(object):
 			self.world.remType(self)
 			self._type = value
 			self.world.addType(self)
-	type = property(get_type, set_type)
+	type = property(lambda self: self._type, set_type)
 	
 	#add a tween to update
 	def addTween(self, tween):
@@ -247,10 +242,10 @@ class Entity(object):
 
 	def removed(self):pass
 	
-	def render(self, App):
+	def render(self):
 		"""Render graphic"""
 		if self.graphic and self.visible:
-			self.graphic.render(App, (self.x, self.y))
+			self.graphic.render(Punk.buffer, Point(self.x, self.y), Punk.camera)
 	
 	def collide(self, type, x, y):
 		"""Check for collision
