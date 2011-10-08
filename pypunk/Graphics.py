@@ -1,4 +1,5 @@
 from PySFML import sf
+from Graphic import Graphic
 
 #Reference to colour
 Color = sf.Color
@@ -8,11 +9,12 @@ class Rectangle:
 		self.x = x; self.y = y;
 		self.width = width; self.height = height;
 
-class Image(sf.Sprite):
+class Image(Graphic, sf.Sprite):
 	def __init__(self, loc, rect=None):
 		"""Create new Image
 		Args:
-		loc: location of image / sf.Image instance"""
+		loc: location of image"""
+		Graphic.__init__(self)
 		if type(loc) == str:
 			self.img = GetImage(loc)
 		elif type(loc) == sf.Image:
@@ -25,24 +27,42 @@ class Image(sf.Sprite):
 		if rect:
 			self.SetSubRect(sf.IntRect(rect.x, rect.y, rect.x+rect.width, rect.y+rect.height))
 
-		#Positions for drawing (relative to parent object)
-		self.x = 0
-		self.y = 0
+		# Rotation of the image, in degrees.
+		self.angle = 0
 
-		self.visible = True
+		# Scale of the image, affects both x and y scale.
+		self.scale = 1
+
+		# X scale of the image.
+		self.scaleX = 1
+
+		# Y scale of the image.
+		self.scaleY = 1
+
+		# X origin of the image, determines transformation point.
+		self.originX = 0
+
+		# Y origin of the image, determines transformation point.
+		self.originY = 0
 
 		self._alpha = 1.0
 
 	def render(self, App, pos=(0, 0)):
 		"""Render the image to App"""
 		self.SetPosition(int(self.x+pos[0]), int(self.y+pos[1]))
-		if self.visible: App.Draw(self)
+		if self.visible:
+			App.Draw(self)
 	
 	def set_alpha(self, value):
 		if value > 1: value = 1
 		self._alpha = value
 		self.SetColor(sf.Color(255, 255, 255, int(value*255)))
 	alpha = property(lambda self: self._alpha, set_alpha)
+
+
+class Spritemap(Image):
+	def __init__(self, source, frameWidth=0, frameHeight=0, callback=None):
+		Image.__init__(self, loc)
 
 class Shape(sf.Shape):
 	def __init__(self):
