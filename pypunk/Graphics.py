@@ -1,5 +1,5 @@
 from PySFML import sf
-from Punk import Point
+from Punk import *
 
 #Reference to colour
 Color = sf.Color
@@ -8,8 +8,6 @@ class Rectangle:
 	def __init__(self, x, y, width, height):
 		self.x = x; self.y = y;
 		self.width = width; self.height = height;
-
-
 
 class Graphic(object):
 	def __init__(self):
@@ -28,6 +26,7 @@ class Graphic(object):
 		# If the graphic should render at its position relative to its parent Entity's position.
 		self.relative = True
 
+		#Scroll does nothing as of yet
 		# X scrollfactor, effects how much the camera offsets the drawn graphic.
 		# Can be used for parallax effect, eg. Set to 0 to follow the camera,
 		# 0.5 to move at half-speed of the camera, or 1 (default) to stay still.
@@ -42,21 +41,28 @@ class Graphic(object):
 		self._assign = None		# private
 		self._scroll = True		# private
 		self._point = Point()	# private
+		self._alpha = 1.0		# private
 
-
-	def update(self):
-		pass
-
-	def render(self, target, point, camera):
-		pass
+	def render(self, App, point=Punk.zero, camera=Punk.camera):
+		"""Render the image to App"""
+		#Does not take camera into effect. will fix later :3
+		if self.relative: self.SetPosition(int(self.x+point.x), int(self.y+point.y))
+		else: self.SetPosition(int(self.x), int(self.y))
+		if self.visible:
+			App.Draw(self)
 
 	@property
 	def assign(self):
 		return self._assign
-
 	@assign.setter
 	def assign(self, value):
 		self._assign = value
+	
+	def set_alpha(self, value):
+		if value > 1: value = 1
+		self._alpha = value
+		self.SetColor(sf.Color(255, 255, 255, int(value*255)))
+	alpha = property(lambda self: self._alpha, set_alpha)
 
 class Image(Graphic, sf.Sprite):
 	def __init__(self, loc, rect=None):
@@ -64,17 +70,15 @@ class Image(Graphic, sf.Sprite):
 		Args:
 		loc: location of image"""
 		Graphic.__init__(self)
-		if type(loc) == str:
-			self.img = GetImage(loc)
-		elif type(loc) == sf.Image:
-			self.img = loc
-		else:
-			raise TypeError("Please pass the path to an image or a sf.Image instance")
+		if type(loc) == str: self.img = GetImage(loc)
+		elif type(loc) == sf.Image: self.img = loc
+		else: raise TypeError("Please pass the path to an image or a sf.Image instance")
 		sf.Sprite.__init__(self, self.img)
 
-		#Sprite.SetSubRect(sf::IntRect(10, 10, 20, 20));
 		if rect:
 			self.SetSubRect(sf.IntRect(rect.x, rect.y, rect.x+rect.width, rect.y+rect.height))
+
+		#None of \/THESE\/ do anything right now. Will be added later
 
 		# Rotation of the image, in degrees.
 		self.angle = 0
@@ -94,32 +98,15 @@ class Image(Graphic, sf.Sprite):
 		# Y origin of the image, determines transformation point.
 		self.originY = 0
 
-		self._alpha = 1.0
-
-	def render(self, App, pos=(0, 0)):
-		"""Render the image to App"""
-		self.SetPosition(int(self.x+pos[0]), int(self.y+pos[1]))
-		if self.visible:
-			App.Draw(self)
-	
-	def set_alpha(self, value):
-		if value > 1: value = 1
-		self._alpha = value
-		self.SetColor(sf.Color(255, 255, 255, int(value*255)))
-	alpha = property(lambda self: self._alpha, set_alpha)
-
-
 class Spritemap(Image):
 	def __init__(self, source, frameWidth=0, frameHeight=0, callback=None):
 		Image.__init__(self, loc)
 
-class Shape(sf.Shape):
+class Shape(Graphic, sf.Shape):
 	def __init__(self):
 		"""Create a shape"""
+		Graphic.__init__(self)
 		sf.Shape.__init__(self)
-		self.x = 0
-		self.y = 0
-		self._alpha = 1.0
 	
 	def createRect(self, width, height, colour):
 		"""Predefined rectangle shape"""
@@ -127,29 +114,17 @@ class Shape(sf.Shape):
 		self.AddPoint(width, 0, colour)
 		self.AddPoint(width, height, colour)
 		self.AddPoint(0, height, colour)
-	
-	def render(self, App, pos=(0, 0)):
-		self.SetPosition(int(self.x+pos[0]), int(self.y+pos[1]))
-		App.Draw(self)
-	
-	def set_alpha(self, value):
-		if value > 1: value = 1
-		self._alpha = value
-		self.SetColor(sf.Color(255, 255, 255, int(value*255)))
-	alpha = property(lambda self: self._alpha, set_alpha)
 
-class Text(sf.String):
+class Text(Graphic, sf.String):
 	def __init__(self, loc, text="", size=16):
 		"""Create text graphic
 		Args:
 		loc: location of font
 		text: text to display
 		size: font size"""
-		self.fnt = GetFont(loc, size)
+		Graphic.__init__(self)
 
-		self.x = 0
-		self.y = 0
-		self._alpha = 1.0
+		self.fnt = GetFont(loc, size)
 
 		sf.String.__init__(self)
 		self.SetText(text)
@@ -170,16 +145,6 @@ class Text(sf.String):
 	def set_size(self, value): self.SetSize(value)
 	size = property(lambda self: self.GetSize(), set_size)
 
-	def set_alpha(self, value):
-		if value > 1: value = 1
-		self._alpha = value
-		self.SetColor(sf.Color(255, 255, 255, int(value*255)))
-	alpha = property(lambda self: self._alpha, set_alpha)
-	
-	def render(self, App, pos=(0, 0)):
-		self.SetPosition(int(self.x+pos[0]), int(self.y+pos[1]))
-		App.Draw(self)
-
 class Graphiclist(object):
 	def __init__(self, *args):
 		"""List of graphics to render"""
@@ -190,9 +155,9 @@ class Graphiclist(object):
 	def remove(self, toRem):
 		self.list.remove(toRem)
 	
-	def render(self, App, pos=(0,0)):
+	def render(self, App, point=Punk.zero, camera=Punk.camera):
 		for obj in self.list:
-			obj.render(App, pos)
+			obj.render(App, point, camera)
 
 #Caches
 imageCache = {}
