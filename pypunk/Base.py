@@ -98,6 +98,9 @@ class World(object):
 
 		self._add = []
 		self._remove = []
+
+		self.active = True
+		self.visible = True
 	
 	def update(self, App):
 		"""Called every frame. Updates Entities that have been added"""
@@ -106,10 +109,10 @@ class World(object):
 			#Loop through objects on the layer
 			for i in range(len(self._layerList[layer])):
 				object = self._layerList[layer][i]
-				if not object.paused:
+				if object.active and self.active:
 					object.updateTweens()
 					object.update()
-				if object.visible:
+				if object.visible and self.visible:
 					object.render(App)
 					
 	def add(self, toAdd):
@@ -119,6 +122,11 @@ class World(object):
 	def remove(self, toRemove):
 		"""Remove a previously added entity from the world"""
 		self._remove.append(toRemove)
+	
+	def removeAll(self):
+		self._layerList = {}
+		self._typeList = {}
+		self._add = []
 	
 	def endOfFrame(self):
 		"""Internal - add/remove entities from the world"""
@@ -186,7 +194,7 @@ class Entity(object):
 		self.visible = True
 
 		#Should be updated
-		self.paused = False
+		self.active = True
 
 		#Parent world
 		self.world = None
