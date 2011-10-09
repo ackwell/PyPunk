@@ -117,6 +117,8 @@ class Tilemap(Graphic, sf.Sprite):
 		self._height = height
 		self._columns = int(math.ceil(width / tileWidth))
 		self._rows = int(math.ceil(height / tileHeight))
+		self._tileCols = self.GetImage().GetWidth() / tileWidth
+		self._tileRows = self.GetImage().GetHeight() / tileHeight
 		self._tile = Rectangle(0, 0, tileWidth, tileHeight)
 
 		#-1 == do not draw
@@ -145,11 +147,16 @@ class Tilemap(Graphic, sf.Sprite):
 			for row in range(len(self._map[col])):
 				tile = self._map[col][row]
 				if not tile == -1:
-					self._tile.x = int(tile % self._columns * self._tile.width)
-					self._tile.y = int(math.ceil(tile / self._columns) * self._tile.height)
+					self._tile.x = int((tile % self._tileCols) * self._tile.width)
+					self._tile.y = int(math.ceil(tile / self._tileCols) * self._tile.height)
+					#print self._tile.x, self._tile.y
 					self.SetSubRect(sf.IntRect(self._tile.x, self._tile.y, self._tile.x+self._tile.width, self._tile.y+self._tile.height))
-					if self.relative: self.SetPosition(int(self.x+point.x+col*self._tile.width), int(self.y+point.y+row*self._tile.height))
-					else: self.SetPosition(int(self.x+col*self._tile.width), int(self.y+row*self._tile.height))
+					
+					offsetx = int(self.x + col*self._tile.width - camera.x);
+					offsety = int(self.y + row*self._tile.height - camera.y)
+					if self.relative: offsetx += point.x; offsety += point.y
+					self.SetPosition(offsetx, offsety)
+
 					App.Draw(self)
 #####################################
 
