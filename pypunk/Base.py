@@ -16,6 +16,8 @@ class Engine(object):
 
 		#Provide engine reference to punk
 		Punk.Engine = self
+		Punk.width = width
+		Punk.height = height
 
 		#Set initial settings
 		self.width = width

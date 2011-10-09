@@ -1,5 +1,6 @@
 from PySFML import sf
 from Punk import *
+import math
 
 #Reference to colour
 Color = sf.Color
@@ -101,6 +102,56 @@ class Image(Graphic, sf.Sprite):
 class Spritemap(Image):
 	def __init__(self, source, frameWidth=0, frameHeight=0, callback=None):
 		Image.__init__(self, loc)
+
+############WORKING##################
+class Tilemap(Graphic, sf.Sprite):
+	def __init__(self, loc, width, height, tileWidth, tileHeight):
+		Graphic.__init__(self)
+
+		if type(loc) == str: self.img = GetImage(loc)
+		elif type(loc) == sf.Image: self.img = loc
+		else: raise TypeError("Please pass the path to an image or a sf.Image instance")
+		sf.Sprite.__init__(self, self.img)
+
+		self._width = width
+		self._height = height
+		self._columns = int(math.ceil(width / tileWidth))
+		self._rows = int(math.ceil(height / tileHeight))
+		self._tile = Rectangle(0, 0, tileWidth, tileHeight)
+
+		#-1 == do not draw
+		self._map = [[-1 for j in range(self._rows)] for i in range(self._columns)]
+	
+	def setTile(self, column, row, index):
+		self._map[column][row] = index
+	
+	def clearTile(self, column, row):
+		self.setTile(column, row, -1)
+	
+	def getTile(self, column, row):
+		return self._map[column][row]
+	
+	def setRect(self, column, row, width=1, height=1, index=0):
+		for cl in range(column, column+width):
+			for rw in range(row, row+height):
+				self._map[cl][rw] = index
+	
+	def clearRect(self, column, row, width=1, height=1):
+		self.setRect(column, row, height, width, -1)
+
+	def render(self, App, point=Punk.zero, camera=Punk.camera):
+		if not self.visible: return
+		for col in range(len(self._map)):
+			for row in range(len(self._map[col])):
+				tile = self._map[col][row]
+				if not tile == -1:
+					self._tile.x = int(tile % self._columns * self._tile.width)
+					self._tile.y = int(math.ceil(tile / self._columns) * self._tile.height)
+					self.SetSubRect(sf.IntRect(self._tile.x, self._tile.y, self._tile.x+self._tile.width, self._tile.y+self._tile.height))
+					if self.relative: self.SetPosition(int(self.x+point.x+col*self._tile.width), int(self.y+point.y+row*self._tile.height))
+					else: self.SetPosition(int(self.x+col*self._tile.width), int(self.y+row*self._tile.height))
+					App.Draw(self)
+#####################################
 
 class Shape(Graphic, sf.Shape):
 	def __init__(self):

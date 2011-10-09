@@ -12,6 +12,9 @@ class _punk(object):
 		self.elapsed = 0
 		self.FPS = 0
 
+		self.width = 0
+		self.height = 0
+
 		self.camera = Point()
 	
 	def set_world(self, value):
