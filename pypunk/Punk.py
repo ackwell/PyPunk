@@ -26,9 +26,9 @@ class _punk(object):
 
 	screen = property(lambda self: self.Engine.App.Capture())
 
-	#Various utilities
-	zero = Point()
-
-	def choose(*args):
+	def choose(self, *args):
 		return args[random.randint(0, len(args)-1)]
+	
+	def sign(self, value):
+		return -1 if value < 0 else 1 if value > 0 else 0
 Punk = _punk()

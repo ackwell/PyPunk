@@ -190,6 +190,8 @@ class Entity(object):
 		#Collision
 		self.width = 0
 		self.height = 0
+		self.originX = 0
+		self.originY = 0
 		self._type = ""
 		self.collidable = True
 
@@ -255,13 +257,24 @@ class Entity(object):
 		type: type to check against
 		x: virtual x position to place this entity
 		y: virtual y position to place this entity"""
+		_x = self.x; _y = self.y
+		self.x = x; self.y = y
 		try:
 			for e in self.world._typeList[type]:
 				if e.collidable and not e == self:
-					if self.x < e.x+e.width \
-					and self.x+self.width > e.x \
-					and self.y < e.y+e.height \
-					and self.y+self.height > e.y:
+					if self.x - self.originX + self.width > e.x - e.originX \
+					and self.y - self.originY + self.height > e.y - e.originY \
+					and self.x - self.originX < e.x - e.originX + e.width \
+					and self.y - self.originY < e.y - e.originY + e.height:
+						self.x = _x; self.y = _y
 						return e
+
 		except KeyError: pass
+		self.x = _x; self.y = _y
 		return None
+	
+	def setHitbox(self, width=0, height=0, originX=0, originY=0):
+		self.width = width
+		self.height = height
+		self.originX = originX
+		self.originY = originY
