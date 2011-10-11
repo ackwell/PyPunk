@@ -60,7 +60,9 @@ class Engine(object):
 			Event.Input.ClearVars()
 			self.App.Clear(self._bgColour)
 			Event.DispatchEvents(self.App)
-			if self.World: self.World.update()
+			if self.World: 
+				self.World.update()
+				self.World.render()
 			self.App.Display()
 			Audio.checkSounds()
 			if self.World: self.World.endOfFrame()
@@ -115,6 +117,10 @@ class World(object):
 				if object.active and self.active:
 					object.updateTweens()
 					object.update()
+	def render(self):
+	 	for layer in sorted(self._layerList.iterkeys(), reverse=True):
+			for i in range(len(self._layerList[layer])):
+				object = self._layerList[layer][i]
 				if object.visible and self.visible:
 					object.render()
 					
@@ -261,17 +267,32 @@ class Entity(object):
 		self.x = x; self.y = y
 		try:
 			for e in self.world._typeList[type]:
-				if e.collidable and not e == self:
-					if self.x - self.originX + self.width > e.x - e.originX \
-					and self.y - self.originY + self.height > e.y - e.originY \
-					and self.x - self.originX < e.x - e.originX + e.width \
-					and self.y - self.originY < e.y - e.originY + e.height:
-						self.x = _x; self.y = _y
-						return e
-
+				ent = self.checkCol(e)
+				if ent:
+					self.x = _x; self.y = _y
+					return ent
 		except KeyError: pass
 		self.x = _x; self.y = _y
 		return None
+	
+	def collideWith(self, e, x, y):
+		_x = self.x; _y = self.y
+		self.x = x; self.y = y
+		ent = self.checkCol(e)
+		if ent:
+			self.x = _x; self.y = _y
+			return ent
+		return None
+	
+	def checkCol(self, e):
+		if e.collidable and not e == self:
+			if self.x - self.originX + self.width > e.x - e.originX \
+			and self.y - self.originY + self.height > e.y - e.originY \
+			and self.x - self.originX < e.x - e.originX + e.width \
+			and self.y - self.originY < e.y - e.originY + e.height:
+				return e
+		return None
+
 	
 	def setHitbox(self, width=0, height=0, originX=0, originY=0):
 		self.width = width
