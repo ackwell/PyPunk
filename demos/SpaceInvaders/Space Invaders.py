@@ -205,7 +205,7 @@ class HUD(Entity):
 			if self.input.IsKeyDown(Key.Return):
 				HUD.score = 0
 				HUD.gameOver = False
-				Punk.SetWorld(GameRoom())
+				Punk.set_world(GameRoom())
 
 #ENTRY POINT
 if __name__ == "__main__":
