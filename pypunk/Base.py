@@ -175,6 +175,81 @@ class World(object):
 		if e.type:
 			self._typeList[e.type].remove(e)
 	
+	#Collisions
+	def collidePoint(self, type, pX, pY):
+		try:
+			for e in self._typeList[type]:
+				if e.collidePoint(e.x, e.y, pX, pY): return e
+		except KeyError: pass
+		return None
+
+	def collideLine(self, type, fromX, fromY, toX, toY, precision=1, p=None):
+		if precision < 1: precision = 1
+		if Punk.distance(fromX, fromY, toX, toY) < precision:
+			if p:
+				if fromX == toX and fromY == toY:
+					p.x = toX; p.y = toY
+					return self.collidePoint(type, toX, toY)
+				return self.collideLine(type, fromX, fromY, toX, toY, 1, p)
+			else: return self.collidePoint(type, fromX, toY)
+		xDelta = math.fabs(toX-fromX)
+		yDelta = math.fabs(toY-fromY)
+		xSign = precision if toX>fromX else -precision
+		ySign = precision if toY>fromY else -precision
+		x = fromX
+		y = fromY
+		if xDelta>yDelta:
+			ySign*=yDelta/xDelta
+			if xSign>0:
+				while x<toX:
+					e = self.collidePoint(type, x, y)
+					if e:
+						if not p: return e
+						if precision < 2:
+							p.x=x-xSign;p.y=y-ySign
+							return e
+						return self.collideLine(type, x-xSign, y-ySign, toX, toY, 1, p)
+					x+=xSign;y+=ySign
+			else:
+				while x>toX:
+					e=self.collidePoint(type, x, y)
+					if e:
+						if not p: return e
+						if precision < 2:
+							p.x=x-xSign;p.y=y-ySign
+							return e
+						return self.collideLine(type, x-xSign, y-ySign, toX, toY, 1, p)
+					x+=xSign;y+=ySign
+		else:
+			xSign*=xDelta/yDelta
+			if ySign>0:
+				while y<toY:
+					e = self.collidePoint(type, x, y)
+					if e:
+						if not p: return e
+						if precision < 2:
+							p.x=x-xSign;p.y=y-ySign
+							return e
+						return self.collideLine(type, x-xSign, y-ySign, toX, toY, 1, p)
+					x+=xSign;y+=ySign
+			else:
+				while y>toY:
+					e=self.collidePoint(type, x, y)
+					if e:
+						if not p: return e
+						if precision < 2:
+							p.x=x-xSign;p.y=y-ySign
+							return e
+						return self.collideLine(type, x-xSign, y-ySign, toX, toY, 1, p)
+					x+=xSign;y+=ySign
+		if precision>1:
+			if not p: return self.collidePoint(type, toX, toY)
+			if self.collidePoint(type, toX, toY):
+				return self.collideLine(type, x-xSign, y-ySign, toX, toY, 1, p)
+		if p:
+			p.x=toX;p.y=toY
+		return None
+		
 	def end(self):
 		self._layerList = {}
 		self._typeList = {}
@@ -292,7 +367,12 @@ class Entity(object):
 			and self.y - self.originY < e.y - e.originY + e.height:
 				return e
 		return None
-
+	
+	def collidePoint(self, x, y, pX, pY):
+		if pX>=x-self.originX and pY>=y-self.originY\
+		and pX<x-self.originX+self.width and pY<y-self.originY+self.height:
+			return True
+		return False
 	
 	def setHitbox(self, width=0, height=0, originX=0, originY=0):
 		self.width = width
