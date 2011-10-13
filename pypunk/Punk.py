@@ -3,6 +3,11 @@ import random, math
 DEG = -180 / math.pi
 RAD = math.pi / -180
 
+class ClassProperty(property):
+	'''Subclass @property to make classmethod properties possible'''
+	def __get__(self, cls, owner):
+		return self.fget.__get__(None, owner)()
+
 class Point(object):
 	def __init__(self, x=0, y=0):
 		self.x = x
@@ -17,7 +22,6 @@ class Point(object):
 	@property
 	def length(self):
 		return math.sqrt((0-self.x)*(0-self.x)+(0-self.y)*(0-self.y))
-
 
 #So we can use properties and such :3
 class _punk(object):
@@ -310,5 +314,164 @@ class _punk(object):
 			return value if value > min2 else min2
 		value = value if value < min2 else min2
 		return value if value > max2 else max2
+
+	@staticmethod
+	def randomizeSeed():
+		'''Randomizes the random seed using Flash's Math.random() function.
+		(simple wrapper around python's random.seed() for FlashPunk users)
+		'''
+		random.seed(2147483647 * random.random())
+
+	@staticmethod
+	def random():
+		'''A pseudo-random Number produced using FP's random seed, where 0 <= Number < 1.
+		(simple wrapper around python's random.random() for FlashPunk users)
+		'''
+		return random.random()
+
+	@staticmethod
+	def rand(amount):
+		'''Returns a pseudo-random uint.
+		@param	amount		The returned uint will always be 0 <= uint < amount.
+		@return	The uint.
+		(simple wrapper around python's random.uniform() for FlashPunk users)
+		'''
+		return random.uniform(0, amount)
+
+	@staticmethod
+	def getColorRGB(R, G, B):
+		'''Creates a color value by combining the chosen RGB values.
+		@param	R		The red value of the color, from 0 to 255.
+		@param	G		The green value of the color, from 0 to 255.
+		@param	B		The blue value of the color, from 0 to 255.
+		@return	The color uint.
+		'''
+		return R << 16 | G << 8 | B
+
+	@staticmethod
+	def getColorHSV(h, s, v):
+		'''Creates a color value with the chosen HSV values.
+		@param	h		The hue of the color (from 0 to 1).
+		@param	s		The saturation of the color (from 0 to 1).
+		@param	v		The value of the color (from 0 to 1).
+		@return	The color uint.
+		'''
+		h = 0 if h < 0 else 1 if h > 1 else h
+		s = 0 if s < 0 else 1 if s > 1 else h
+		v = 0 if v < 0 else 1 if v > 1 else h
+		h = int(h * 360)
+		hi = int(h / 60.0) % 6
+		f = h / 60.0 - int(h / 60.0)
+		p = v * (1 - s)
+		q = v * (1 - f * s)
+		t = v * (1 - (1 - f) * s)
+		if hi == 0: return int(v * 255) << 16 | int(t * 255) << 8 | int(p *255)
+		elif hi == 1: return int(q * 255) << 16 | int(v * 255) << 8 | int(p *255)
+		elif hi == 2: return int(p * 255) << 16 | int(v * 255) << 8 | int(t *255)
+		elif hi == 3: return int(p * 255) << 16 | int(q * 255) << 8 | int(v *255)
+		elif hi == 4: return int(t * 255) << 16 | int(p * 255) << 8 | int(v *255)
+		elif hi == 5: return int(v * 255) << 16 | int(p * 255) << 8 | int(q *255)
+		else: return 0
+
+	
+	@staticmethod
+	def getRed(color):
+		'''Finds the red factor of a color.
+		@param	color		The color to evaluate.
+		@return	A uint from 0 to 255.
+		'''
+		return color >> 16 & 0xFF
+	
+	@staticmethod
+	def getGreen(color):
+		'''Finds the green factor of a color.
+		@param	color		The color to evaluate.
+		@return	A uint from 0 to 255.
+		'''
+		return color >> 8 & 0xFF
+	
+	@staticmethod
+	def getBlue(color):
+		'''Finds the blue factor of a color.
+		@param	color		The color to evaluate.
+		@return	A uint from 0 to 255.
+		'''
+		return color & 0xFF
+
+	@staticmethod
+	def timeFlag():
+		'''Sets a time flag.
+		@return	Time elapsed (in milliseconds) since the last time flag was set.
+		'''
+		pass
+
+	@ClassProperty
+	@classmethod
+	def console(cls):
+		'''The global Console object.
+		'''
+		pass
+
+	@staticmethod
+	def log():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def watch():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def tween():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def alarm():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def frames():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def shuffle():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def sort():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def sortBy():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def _quicksort():
+		'''
+		'''
+		pass
+
+	@staticmethod
+	def _quicksortBy():
+		'''
+		'''
+		pass
+
+
 
 Punk = _punk()
