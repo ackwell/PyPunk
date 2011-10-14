@@ -13,11 +13,16 @@ class Engine(object):
 		title: window caption
 		bgColor: tuple (r,g,b) of background color
 		"""
-
-		#Provide engine reference to punk
-		Punk.Engine = self
+		# global game properties
 		Punk.width = width
 		Punk.height = height
+		Punk.halfWidth = width/2
+		Punk.halfHeight = height/2
+
+		# global game objects
+		Punk.engine = self
+		Punk.bounds = Rectangle(0, 0, width, height)
+		Punk._world = World()
 
 		#Set initial settings
 		self.width = width
@@ -31,7 +36,6 @@ class Engine(object):
 		self.App.SetFramerateLimit(self.fps)
 
 		#Other variables and stuff
-		self.World = None
 		self.ForceSize = True
 
 		#Register events
@@ -60,12 +64,12 @@ class Engine(object):
 			Event.Input.ClearVars()
 			self.App.Clear(self._bgColour)
 			Event.DispatchEvents(self.App)
-			if self.World: 
-				self.World.update()
-				self.World.render()
+			if Punk._world: 
+				Punk._world.update()
+				Punk._world.render()
 			self.App.Display()
 			Audio.checkSounds()
-			if self.World: self.World.endOfFrame()
+			if Punk._world: Punk._world.endOfFrame()
 	
 	#Vars
 	def UpdateVars(self):
@@ -77,8 +81,8 @@ class Engine(object):
 			pass
 	
 	def WorldChanged(self):
-		"""Calls the wold's end function"""
-		self.World.end()
+		"""Calls the world's end function"""
+		Punk.world.end()
 	
 	#Events
 	def onClose(self, args):
@@ -113,16 +117,16 @@ class World(object):
 		for layer in sorted(self._layerList.iterkeys(), reverse=True):
 			#Loop through objects on the layer
 			for i in range(len(self._layerList[layer])):
-				object = self._layerList[layer][i]
-				if object.active and self.active:
-					object.updateTweens()
-					object.update()
+				obj = self._layerList[layer][i]
+				if obj.active and self.active:
+					obj.updateTweens()
+					obj.update()
 	def render(self):
 	 	for layer in sorted(self._layerList.iterkeys(), reverse=True):
 			for i in range(len(self._layerList[layer])):
-				object = self._layerList[layer][i]
-				if object.visible and self.visible:
-					object.render()
+				obj = self._layerList[layer][i]
+				if obj.visible and self.visible:
+					obj.render()
 					
 	def add(self, toAdd):
 		"""Add a new Entity to the world"""
