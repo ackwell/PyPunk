@@ -113,16 +113,16 @@ class World(object):
 		for layer in sorted(self._layerList.iterkeys(), reverse=True):
 			#Loop through objects on the layer
 			for i in range(len(self._layerList[layer])):
-				object = self._layerList[layer][i]
-				if object.active and self.active:
-					object.updateTweens()
-					object.update()
+				obj = self._layerList[layer][i]
+				if obj.active and self.active:
+					obj.updateTweens()
+					obj.update()
 	def render(self):
 	 	for layer in sorted(self._layerList.iterkeys(), reverse=True):
 			for i in range(len(self._layerList[layer])):
-				object = self._layerList[layer][i]
-				if object.visible and self.visible:
-					object.render()
+				obj = self._layerList[layer][i]
+				if obj.visible and self.visible:
+					obj.render()
 					
 	def add(self, toAdd):
 		"""Add a new Entity to the world"""
