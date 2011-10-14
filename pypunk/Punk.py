@@ -1,57 +1,85 @@
 import random, math
 
-DEG = -180 / math.pi
-RAD = math.pi / -180
-
-class ClassProperty(property):
-	'''Subclass @property to make classmethod properties possible'''
-	def __get__(self, cls, owner):
-		return self.fget.__get__(None, owner)()
-
 class Point(object):
 	def __init__(self, x=0, y=0):
 		self.x = x
 		self.y = y
-	
+
 	def normalize(self, scale):
 		norm = math.sqrt(self.x*self.x+self.y*self.y)
 		if not norm == 0:
 			self.x = scale * self.x / norm
 			self.y = scale * self.y / norm
-	
+
 	@property
 	def length(self):
 		return math.sqrt((0-self.x)*(0-self.x)+(0-self.y)*(0-self.y))
 
-#So we can use properties and such :3
-class _punk(object):
-	def __init__(self):
-		self.Engine = None
-		self.elapsed = 0
-		self.FPS = 0
+class Singleton(object):
+	_instance = None
+	def __new__(cls, *args, **kwargs):
+		if not cls._instance:
+			cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
+		return cls._instance
 
-		self.width = 0
-		self.height = 0
+class _Punk(Singleton):
+	'''class used to access global properties and functions.
+	'''
+	Engine = None
+	elapsed = 0
+	FPS = 0
 
-		self.camera = Point()
-	
-	def set_world(self, value):
-		if self.Engine.World: self.Engine.WorldChanged()
-		self.Engine.World = value
-	world = property(lambda self: self.Engine.World, set_world)
+	width = 0
+	height = 0
+	halfWidth = 0
+	halfHeight = 0
+
+	camera = Point()
+
+	# volume control
+	_volume = 1.0	#private
+	_pan = 0.0 		#private
+
+	# Used for rad-to-deg and deg-to-rad conversion
+	DEG = -180 / math.pi
+	RAD = math.pi / -180
 
 	buffer = property(lambda self: self.Engine.App)
 
 	screen = property(lambda self: self.Engine.App.Capture())
 
-	# kind of useless because python already have a choice function
-	# but we should keep it for compatibility with FlashPunk and for
-	# users not used to python
+	def __init__(self):
+		pass
+
+	def set_world(self, value):
+		if self.Engine.World: self.Engine.WorldChanged()
+		self.Engine.World = value
+	world = property(lambda self: self.Engine.World, set_world)
+
+	def setCamera(self, x=0, y=0):
+		self.camera.x, self.camera.y = x, y
+
+	def resetCamera(self):
+		self.camera.x = self.camera.y = 0
+
+	def _set_volume(self, value):
+		'''Global volume factor for all sounds, a value from 0 to 1.
+		'''
+		print 'Not implemented'
+	volume = property(lambda self: self._volume, _set_volume)
+
+	def _set_pan(self, value):
+		'''Global panning factor for all sounds, a value from -1 to 1.
+		'''
+		print 'Not implemented'
+	pan = property(lambda self: self._pan, _set_pan)
+
 	@staticmethod
 	def choose(*args):
 		'''Randomly chooses and returns one of the provided values.
 		@param	...objs		The Objects you want to randomly choose from. Can be ints, Numbers, Points, etc.
 		@return	A randomly chosen one of the provided parameters.
+		(simple wrapper around python's random.choice() for FlashPunk users)
 		'''
 		return random.choice(args)
 
@@ -373,7 +401,6 @@ class _punk(object):
 		elif hi == 5: return int(v * 255) << 16 | int(p * 255) << 8 | int(q *255)
 		else: return 0
 
-	
 	@staticmethod
 	def getRed(color):
 		'''Finds the red factor of a color.
@@ -398,80 +425,119 @@ class _punk(object):
 		'''
 		return color & 0xFF
 
-	@staticmethod
-	def timeFlag():
+	def getBitmap(self, source):
+		'''Fetches a stored BitmapData object represented by the source.
+		@param	source		Embedded Bitmap class.
+		@return	The stored BitmapData object.
+		'''
+		print 'Not implemented'
+
+	def timeFlag(self):
 		'''Sets a time flag.
 		@return	Time elapsed (in milliseconds) since the last time flag was set.
 		'''
-		pass
+		print 'Not implemented'
 
-	@ClassProperty
-	@classmethod
-	def console(cls):
+	@property
+	def console(self):
 		'''The global Console object.
 		'''
-		pass
+		print 'Not implemented'
+		#if not _console: _console = Console()
+		#return _console
+
+	def log(self, *data):
+		'''Logs data to the console.
+		@param	...data		The data parameters to log, can be variables, objects, etc. Parameters will be separated by a space (" ").
+		'''
+		print 'Not implemented'
+
+	def watch(self, *properties):
+		'''Adds properties to watch in the console's debug panel.
+		@param	...properties		The properties (strings) to watch.
+		'''
+		print 'Not implemented'
+
+	def getXML(self, file_):
+		'''Loads the file as an XML object.
+		@param	file_		The embedded file to load.
+		@return	An XML object representing the file.
+		'''
+		print 'Not implemented'
+
+	def tween(self, obj, values, duration, options=None):
+		'''Tweens numeric public properties of an Object. Shorthand for creating a MultiVarTween tween, starting it and adding it to a Tweener.
+		@param	object		The object containing the properties to tween.
+		@param	values		An object containing key/value pairs of properties and target values.
+		@param	duration	Duration of the tween.
+		@param	options		An object containing key/value pairs of the following optional parameters:
+								type		Tween type.
+								complete	Optional completion callback function.
+								ease		Optional easer function.
+								tweener		The Tweener to add this Tween to.
+		@return	The added MultiVarTween object.
+		
+		Example: FP.tween(object, { x: 500, y: 350 }, 2.0, { ease: easeFunction, complete: onComplete } );
+		'''
+		print 'Not implemented'
 
 	@staticmethod
-	def log():
+	def alarm(delay, callback, type_, tweener):
+		'''Schedules a callback for the future. Shorthand for creating an Alarm tween, starting it and adding it to a Tweener.
+		@param	delay		The duration to wait before calling the callback.
+		@param	callback	The function to be called.
+		@param	type_		The tween type (PERSIST, LOOPING or ONESHOT). Defaults to ONESHOT.
+		@param	tweener		The Tweener object to add this Alarm to. Defaults to FP.tweener.
+		@return	The added Alarm object.
+		
+		Example: FP.alarm(5.0, callbackFunction, Tween.LOOPING); // Calls callbackFunction every 5 seconds
 		'''
-		'''
-		pass
+		print 'Not implemented'
 
 	@staticmethod
-	def watch():
+	def frames(from_, to, skip):
+		'''Gets an array of frame indices.
+		@param	from_	Starting frame.
+		@param	to		Ending frame.
+		@param	skip	Skip amount every frame (eg. use 1 for every 2nd frame).
 		'''
-		'''
-		pass
+		print 'Not implemented'
 
 	@staticmethod
-	def tween():
+	def shuffle(a):
+		'''Shuffles the elements in the array.
+		@param	a		The Object to shuffle (an Array or Vector).
 		'''
-		'''
-		pass
+		print 'Not implemented'
 
 	@staticmethod
-	def alarm():
+	def sort(obj, ascending=True):
+		'''Sorts the elements in the array.
+		@param	obj			The Object to sort (an Array or Vector).
+		@param	ascending	If it should be sorted ascending (true) or descending (false).
 		'''
-		'''
-		pass
+		print 'Not implemented'
 
 	@staticmethod
-	def frames():
+	def sortBy(obj, property_, ascending=True):
+		'''Sorts the elements in the array by a property of the element.
+		@param	obj			The Object to sort (an Array or Vector).
+		@param	property_	The numeric property of object's elements to sort by.
+		@param	ascending	If it should be sorted ascending (true) or descending (false).
 		'''
-		'''
-		pass
+		print 'Not implemented'
 
 	@staticmethod
-	def shuffle():
+	def _quicksort(a, left, right, ascending):
+		'''@private Quicksorts the array.
 		'''
-		'''
-		pass
+		print 'Not implemented'
 
 	@staticmethod
-	def sort():
+	def _quicksortBy(a, left, right, ascending, property_):
+		'''@private Quicksorts the array by the property.
 		'''
-		'''
-		pass
-
-	@staticmethod
-	def sortBy():
-		'''
-		'''
-		pass
-
-	@staticmethod
-	def _quicksort():
-		'''
-		'''
-		pass
-
-	@staticmethod
-	def _quicksortBy():
-		'''
-		'''
-		pass
+		print 'Not implemented'
 
 
-
-Punk = _punk()
+Punk = _Punk()
