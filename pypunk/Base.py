@@ -13,11 +13,13 @@ class Engine(object):
 		title: window caption
 		bgColor: tuple (r,g,b) of background color
 		"""
-
-		#Provide engine reference to punk
-		Punk.Engine = self
+		# global game properties
 		Punk.width = width
 		Punk.height = height
+
+		# global game objects
+		Punk.engine = self
+		Punk._world = World()
 
 		#Set initial settings
 		self.width = width
@@ -31,7 +33,6 @@ class Engine(object):
 		self.App.SetFramerateLimit(self.fps)
 
 		#Other variables and stuff
-		self.World = None
 		self.ForceSize = True
 
 		#Register events
@@ -60,12 +61,12 @@ class Engine(object):
 			Event.Input.ClearVars()
 			self.App.Clear(self._bgColour)
 			Event.DispatchEvents(self.App)
-			if self.World: 
-				self.World.update()
-				self.World.render()
+			if Punk._world: 
+				Punk._world.update()
+				Punk._world.render()
 			self.App.Display()
 			Audio.checkSounds()
-			if self.World: self.World.endOfFrame()
+			if Punk._world: Punk._world.endOfFrame()
 	
 	#Vars
 	def UpdateVars(self):
@@ -77,8 +78,8 @@ class Engine(object):
 			pass
 	
 	def WorldChanged(self):
-		"""Calls the wold's end function"""
-		self.World.end()
+		"""Calls the world's end function"""
+		Punk.world.end()
 	
 	#Events
 	def onClose(self, args):

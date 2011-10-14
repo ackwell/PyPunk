@@ -5,11 +5,6 @@ import math
 #Reference to colour
 Color = sf.Color
 
-class Rectangle:
-	def __init__(self, x, y, width, height):
-		self.x, self.y = x, y
-		self.width, self.height = width, height
-
 class Graphic(object):
 	def __init__(self):
 		# if the graphic should render

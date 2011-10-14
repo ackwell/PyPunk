@@ -25,7 +25,11 @@ class Singleton(object):
 class _Punk(Singleton):
 	'''class used to access global properties and functions.
 	'''
-	Engine = None
+	### PUBLIC: ###
+
+	# Global objects
+	engine = None
+
 	elapsed = 0
 	FPS = 0
 
@@ -36,25 +40,28 @@ class _Punk(Singleton):
 
 	camera = Point()
 
+	buffer = property(lambda self: self.engine.App)
+
+	screen = property(lambda self: self.engine.App.Capture())
+
+	### PRIVATE: ###
+
+	# World information
+	_world = None	#private
+	_goto = None	#private
+
 	# volume control
 	_volume = 1.0	#private
 	_pan = 0.0 		#private
 
 	# Used for rad-to-deg and deg-to-rad conversion
-	DEG = -180 / math.pi
-	RAD = math.pi / -180
-
-	buffer = property(lambda self: self.Engine.App)
-
-	screen = property(lambda self: self.Engine.App.Capture())
-
-	def __init__(self):
-		pass
+	DEG = -180 / math.pi	# private
+	RAD = math.pi / -180	# private
 
 	def set_world(self, value):
-		if self.Engine.World: self.Engine.WorldChanged()
-		self.Engine.World = value
-	world = property(lambda self: self.Engine.World, set_world)
+		if self._world: self.engine.WorldChanged()
+		self._world = value
+	world = property(lambda self: self._world, set_world)
 
 	def setCamera(self, x=0, y=0):
 		self.camera.x, self.camera.y = x, y

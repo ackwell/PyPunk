@@ -48,8 +48,8 @@ class GameRoom(World):
 		World.update(self)
 	
 	def spawnAlien(self):
-		x = Punk.Engine.width
-		y = random.random() * (Punk.Engine.height - 100) + 50
+		x = Punk.width
+		y = random.random() * (Punk.height - 100) + 50
 		alien = Alien(x, y)
 		self.add(alien)
 	
@@ -95,12 +95,12 @@ class Ship(Entity):
 			self.y -= self.speed * Punk.elapsed
 	
 	def constrain(self):
-		if self.x > Punk.Engine.width - self.width - 16:
-			self.x = Punk.Engine.width - self.width - 16
+		if self.x > Punk.width - self.width - 16:
+			self.x = Punk.width - self.width - 16
 		elif self.x < 16:
 			self.x = 16
-		if self.y > Punk.Engine.height - self.height - 16:
-			self.y = Punk.Engine.height - self.height - 16
+		if self.y > Punk.height - self.height - 16:
+			self.y = Punk.height - self.height - 16
 		elif self.y < 16:
 			self.y = 16
 	
@@ -161,7 +161,7 @@ class Bullet(Entity):
 	
 	def update(self):
 		self.x += self.speed * Punk.elapsed
-		if self.x > Punk.Engine.width:
+		if self.x > Punk.width:
 			self.world.remove(self)
 
 class HUD(Entity):
@@ -182,18 +182,16 @@ class HUD(Entity):
 
 		self.gameOverText1 = Text(fnt, size=16)
 		self.gameOverText1.color = (107, 107, 107)
-		self.gameOverText1.x = Punk.Engine.width/2-55
-		self.gameOverText1.y = Punk.Engine.height/2-8
+		self.gameOverText1.x = Punk.width/2-55
+		self.gameOverText1.y = Punk.height/2-8
 
 		self.gameOverText2 = Text(fnt, size=16)
 		self.gameOverText2.color = (107, 107, 107)
-		self.gameOverText2.x = Punk.Engine.width/2-138
-		self.gameOverText2.y = Punk.Engine.height/2+8
+		self.gameOverText2.x = Punk.width/2-138
+		self.gameOverText2.y = Punk.height/2+8
 
 		gfxlist = Graphiclist(self.scoreText, self.gameOverText1, self.gameOverText2)
 		self.graphic = gfxlist
-
-		self.input = Punk.Engine.Input
 
 	def update(self):
 		self.scoreText.text = str(HUD.score)
@@ -202,7 +200,7 @@ class HUD(Entity):
 			self.gameOverText1.text = "GAME OVER"
 			self.gameOverText2.text = "PRESS ENTER TO PLAY AGAIN"
 
-			if self.input.IsKeyDown(Key.Return):
+			if Input.pressed(Key.Return):
 				HUD.score = 0
 				HUD.gameOver = False
 				Punk.set_world(GameRoom())
