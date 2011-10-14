@@ -15,6 +15,11 @@ class Point(object):
 	def length(self):
 		return math.sqrt((0-self.x)*(0-self.x)+(0-self.y)*(0-self.y))
 
+class Rectangle:
+	def __init__(self, x, y, width, height):
+		self.x, self.y = x, y
+		self.width, self.height = width, height
+
 class Singleton(object):
 	_instance = None
 	def __new__(cls, *args, **kwargs):
@@ -30,14 +35,20 @@ class _Punk(Singleton):
 	# Global objects
 	engine = None
 
+	# Dimensions
+	width = 0		# Width of the game.
+	height = 0		# Height of the game.
+	halfWidth = 0	# Half width of the game.
+	halfHeight = 0	# Half height of the game.
+
+	# Time related
 	elapsed = 0
 	FPS = 0
 
-	width = 0
-	height = 0
-	halfWidth = 0
-	halfHeight = 0
+	# A rectangle representing the size of the screen.
+	bounds = None
 
+	# Point used to determine drawing offset in the render loop.
 	camera = Point()
 
 	buffer = property(lambda self: self.engine.App)

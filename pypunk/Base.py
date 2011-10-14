@@ -16,9 +16,12 @@ class Engine(object):
 		# global game properties
 		Punk.width = width
 		Punk.height = height
+		Punk.halfWidth = width/2
+		Punk.halfHeight = height/2
 
 		# global game objects
 		Punk.engine = self
+		Punk.bounds = Rectangle(0, 0, width, height)
 		Punk._world = World()
 
 		#Set initial settings
