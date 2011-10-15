@@ -188,12 +188,12 @@ class VarTween(Tween):
 		self._range = 0
 		self._property = None
 	
-	def tween(self, object, property, toValue, duration, ease = None):
-		self._object = object
-		self._property = property
+	def tween(self, obj, property_, toValue, duration, ease = None):
+		self._object = obj
+		self._property = property_
 		self._ease = ease
 
-		self._start = getattr(object, property)
+		self._start = getattr(obj, property_)
 		self._range = toValue - self._start
 		self._target = duration
 		self.start()
@@ -210,14 +210,14 @@ class MultiVarTween(Tween):
 		self._range = []
 		self._object = None
 	
-	def tween(self, object, values, duration, ease = None):
-		self._object = object
+	def tween(self, obj, values, duration, ease = None):
+		self._object = obj
 		self._target = duration
 		self._ease = ease
 		for k, v in values.iteritems():
 			self._vars.append(k)
-			self._start.append(getattr(object, k))
-			self._range.append(v - getattr(object, k))
+			self._start.append(getattr(obj, k))
+			self._range.append(v - getattr(obj, k))
 		self.start()
 	
 	def updateTween(self):
