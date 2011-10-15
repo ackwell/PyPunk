@@ -1,4 +1,5 @@
 import random, math
+from Tweens import Tweener
 
 class Point(object):
 	def __init__(self, x=0, y=0):
@@ -50,6 +51,8 @@ class _Punk(Singleton):
 
 	# Point used to determine drawing offset in the render loop.
 	camera = Point()
+
+	tweener = Tweener() # Global Tweener for tweening values across multiple worlds.
 
 	buffer = property(lambda self: self.engine.App)
 
@@ -499,8 +502,7 @@ class _Punk(Singleton):
 		'''
 		print 'Not implemented'
 
-	@staticmethod
-	def alarm(delay, callback, type_, tweener):
+	def alarm(self, delay, callback, type_=2, tweener=None):
 		'''Schedules a callback for the future. Shorthand for creating an Alarm tween, starting it and adding it to a Tweener.
 		@param	delay		The duration to wait before calling the callback.
 		@param	callback	The function to be called.
@@ -510,7 +512,11 @@ class _Punk(Singleton):
 		
 		Example: FP.alarm(5.0, callbackFunction, Tween.LOOPING); // Calls callbackFunction every 5 seconds
 		'''
-		print 'Not implemented'
+		from Tweens import Alarm
+		if not tweener: tweener = Punk.tweener
+		alarm = Alarm(delay, callback, type_)
+		tweener.addTween(alarm, True)
+		return alarm
 
 	@staticmethod
 	def frames(from_, to, skip):
