@@ -1,9 +1,9 @@
 from PySFML import sf
-import Punk, math
+import math
 
-TWEEN_PERSIST = 0
-TWEEN_LOOP = 1
-TWEEN_ONESHOT = 2
+TWEEN_PERSIST = 0	# Persistent Tween type, will stop when it finishes.
+TWEEN_LOOP = 1		# Looping Tween type, will restart immediately when it finishes.
+TWEEN_ONESHOT = 2	# Oneshot Tween type, will stop and remove itself from its core container when it finishes.
 
 #maybe make an exists var so tweens can be removed?
 
@@ -46,17 +46,21 @@ class Tween():
 		self.active = False
 		self._time = 0
 		self._t = 0
-		self._parent = None
 
+		self._finish = False
+		self._parent = None
+		self._prev = None
+		self._next = None
 	
-	def updateTween(self):
+	def update(self):
+		from Punk import Punk
 		self._time += Punk.elapsed
 		self._t = self._time / self._target
 		if not self._ease == None and self._t > 0 and self._t < 1:
 			self._t = self._ease(self._t)
 		if self._time >= self._target:
 			self._t = 1
-			self.finish()
+			self._finish = True
 	
 	def start(self):
 		self._time = 0
@@ -71,19 +75,20 @@ class Tween():
 			self._parent.removeTween(self)
 
 	def finish(self):
-		if self._type == 0: #Persist
+		if self._type == TWEEN_PERSIST:
 			self._time = self._target
 			self.active = False
-		elif self._type == 1: #Looping
+		elif self._type == TWEEN_LOOP:
 			self._time %= self._target
 			self._t = self._time / self._target
 			if not self._ease == None and self._t > 0 and self._t < 1:
 				self._t = self._ease(self._t)
 			self.start()
-		elif self._type == 2: #Oneshot
+		elif self._type == TWEEN_ONESHOT:
 			self._time = self._target
 			self.active = False
 			self._parent.removeTween(self)
+		self._finish = False
 		if self.complete:
 			self.complete()
 	
@@ -95,6 +100,68 @@ class Tween():
 
 	@property
 	def scale(self): return self._t
+
+
+class Tweener(object):
+	'''Updateable Tween container.
+	'''
+	def __init__(self):
+		self.active = True
+		self.autoClear = False
+
+		self._tween = None 	# private
+
+	def update(self):
+		pass
+
+	def addTween(self, t, start=False):
+		if t._parent: raise Exception("Cannot add a Tween object more than once.")
+		t._parent = self
+		t._next = self._tween
+		if self._tween: self._tween._prev = t
+		self._tween = t
+		if (start): self._tween.start()
+		return t
+	
+	def removeTween(self, t):
+		if t._parent != self: raise Exception("Core object does not contain Tween.")
+		if t._next: t._next._prev = t._prev
+		if t._prev: t._prev._next = t._next
+		else: self._tween = t._next
+		t._next = t._prev = None
+		t._parent = None
+		t.active = False
+		return t
+
+	def clearTweens(self):
+		t = self._tween
+		while t:
+			n = t._next
+			removeTween(t)
+			t = n
+
+	def updateTweens(self):
+		t = self._tween
+		while t:
+			n = t._next
+			if (t.active):
+				t.update()
+				if t._finish: t.finish()
+			t = n
+			
+class Alarm(Tween):
+	'''A simple alarm, useful for timed events, etc.
+	'''
+	def __init__(self, duration, complete=None, type_=0):
+		Tween.__init__(self, duration, type_, complete, None)
+
+	def reset(self, duration):
+		self._target = duration
+		self.start()
+
+	elapsed = property(lambda self: self._time)
+	duration = property(lambda self: self._target)
+	remaining = property(lambda self: self._target - self._time)
 
 class NumTween(Tween):
 	def __init__(self, complete = None, type = 0):
@@ -121,12 +188,12 @@ class VarTween(Tween):
 		self._range = 0
 		self._property = None
 	
-	def tween(self, object, property, toValue, duration, ease = None):
-		self._object = object
-		self._property = property
+	def tween(self, obj, property_, toValue, duration, ease = None):
+		self._object = obj
+		self._property = property_
 		self._ease = ease
 
-		self._start = getattr(object, property)
+		self._start = getattr(obj, property_)
 		self._range = toValue - self._start
 		self._target = duration
 		self.start()
@@ -143,14 +210,14 @@ class MultiVarTween(Tween):
 		self._range = []
 		self._object = None
 	
-	def tween(self, object, values, duration, ease = None):
-		self._object = object
+	def tween(self, obj, values, duration, ease = None):
+		self._object = obj
 		self._target = duration
 		self._ease = ease
 		for k, v in values.iteritems():
 			self._vars.append(k)
-			self._start.append(getattr(object, k))
-			self._range.append(v - getattr(object, k))
+			self._start.append(getattr(obj, k))
+			self._range.append(v - getattr(obj, k))
 		self.start()
 	
 	def updateTween(self):

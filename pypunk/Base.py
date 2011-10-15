@@ -1,6 +1,8 @@
 from PySFML import sf
 from Punk import *
-import Event, Audio
+import Event
+import Audio
+import Tweens
 
 #Base class, handles window initiation, etc.
 class Engine(object):
@@ -64,6 +66,7 @@ class Engine(object):
 			Event.Input.ClearVars()
 			self.App.Clear(self._bgColour)
 			Event.DispatchEvents(self.App)
+			if Punk.tweener.active and Punk.tweener._tween: Punk.tweener.updateTweens()
 			if Punk._world: 
 				Punk._world.update()
 				Punk._world.render()
@@ -119,8 +122,9 @@ class World(object):
 			for i in range(len(self._layerList[layer])):
 				obj = self._layerList[layer][i]
 				if obj.active and self.active:
-					obj.updateTweens()
+					if obj._tween: obj.updateTweens()
 					obj.update()
+
 	def render(self):
 	 	for layer in sorted(self._layerList.iterkeys(), reverse=True):
 			for i in range(len(self._layerList[layer])):
@@ -261,12 +265,13 @@ class World(object):
 		self._remove = []
 
 
-class Entity(object):
+class Entity(Tweens.Tweener):
 	def __init__(self, x=0, y=0, graphic = None):
 		"""Creates new Entity object
 		Args:
 		x: Initial x position of entity
 		y: Initial y position of entity"""
+		Tweens.Tweener.__init__(self)
 		#Positioning
 		self.x = x
 		self.y = y
@@ -290,8 +295,6 @@ class Entity(object):
 		#Parent world
 		self.world = None
 
-		self.tweens = []
-
 	def set_layer(self, value):
 		#If has not been added to world yet
 		if not self.world:
@@ -311,19 +314,6 @@ class Entity(object):
 			self._type = value
 			self.world.addType(self)
 	type = property(lambda self: self._type, set_type)
-	
-	#add a tween to update
-	def addTween(self, tween):
-		"""Add a tween to update"""
-		self.tweens.append(tween)
-		tween._parent = self
-	
-	def removeTween(self, tween):
-		self.tweens.remove(tween)
-
-	def updateTweens(self):
-		for tween in self.tweens:
-			tween.updateTween()
 	
 	def update(self): pass
 	
