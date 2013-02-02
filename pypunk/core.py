@@ -28,6 +28,12 @@ class _pp(Singleton):
 			return
 		cls._goto = world
 	world = property(lambda cls:cls._world, _set_world)
+
+	# Global objects for rendering/collision/etc
+	point = Point()
+	point2 = Point()
+	zero = Point()
+	rect = Rectangle()
 PP = _pp()
 
 class Engine(object):
@@ -190,27 +196,21 @@ class Tween(object):
 	def __init__(self, duration, _type=0, complete=None, ease=None):
 		# Public variables
 		self.active = False
-		self.complete = None
+		self.complete = complete
 
 		# Private variables
 		# Tween info
-		self._type = 0
-		self._ease = None
+		self._type = _type
+		self._ease = ease
 		self._t = 0
 		# Timing info
 		self._time = 0
-		self._target = 0
+		self._target = duration
 		# List info
 		self._finish = False
 		self._parent = None
 		self._prev = None
 		self._next = None
-
-		# Finally, the init
-		self._target = duration
-		self._type = _type
-		self.complete = complete
-		self._ease = ease
 
 	def update(self):
 		self._time += PP.elapsed
@@ -371,8 +371,110 @@ class World(Tweener):
 
 
 class Entity(Tweener):
-	def __init__(self):
+	def __init__(self, x=0, y=0, graphic=None, mask=None):
 		super().__init__()
+
+		# Public variables
+		self.visible = True
+		self.collidable = True
+		self.x = x
+		self.y = y
+		self.width = 0
+		self.height = 0
+		self.origin_x = 0
+		self.origin_y = 0
+		#rendertarget?
+
+		# Private variables
+		self._class = self.__class__.__name__
+		self._world = None
+		self._type = ''
+		self._name = ''
+		self._layer = 0
+		# hitbox?
+		self._mask = None
+		self._graphic = None
+		self._point = PP.point
+		self._camera = PP.point2
+
+		if graphic:
+			self.graphic = graphic
+		if mask:
+			self.mask = mask
+		#self.HITBOX.assign_to(self)
+
+	def added(self): pass
+
+	def removed(self): pass
+
+	def update(self): pass
+
+	def render(self):
+		if self._graphic and self._graphic.visible:
+			if self._graphic.relative:
+				self._point.x = self.x
+				self._point.y = self.y
+			else:
+				self._point.x = self._point.y = 0
+			self._camera.x = self._world.camera.x if _world else PP.camera.x
+			self._camera.y = self._world.camera.y if _world else PP.camera.y
+			# RENDER GRAPHIC
+
+	# COLLISION FUNCTIONS
+
+	# onCamera
+
+	world = property(lambda self:self._world)
+
+	left = property(lambda self:self.x-origin_x)
+	right = property(lambda self:self.left+self.width)
+	top = property(lambda self:self.y-self.origin_y)
+	bottom = property(lambda self:self.top+self.height)
+	center_x = property(lambda self:self.left+self.width/2)
+	center_y = property(lambda self:self.top+self.height/2)
+
+	def _set_layer(self, value):
+		if self._layer == value:
+			return
+		if not self._world:
+			self._layer = value
+			return
+		self._world.remove_layer(self)
+		self._layer = value
+		self._world.add_layer(self)
+	layer = property(lambda self:self._layer, _set_layer)
+
+	def _set_type(self, value):
+		if self_type == value:
+			return
+		if not self._world:
+			self._type = value
+			return
+		if self._type:
+			self._world.remove_type(self)
+		self._type = value
+		if self._type:
+			self._world.add_type(self)
+	# Bad code, i know. SOWEEEE
+	type = property(lambda self:self._type, _set_type)
+
+	# SET HITBOX, ETC
+
+	def center_origin(self):
+		self.origin_x = width/2
+		self.origin_y = height/2
+
+	# DISTANCE FUNCTIONS
+
+	def __str__(self):
+		return self._class
+
+	# MOVE FUNCTIONS
+
+	# GET/SET NAME. I CEEBS RIGHT NOW
+
+	def get_class(self):
+		return self._class
 
 
 class Screen(sfml.RenderWindow):

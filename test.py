@@ -1,8 +1,21 @@
-from pypunk.core import PP, Engine, World
+from pypunk.core import PP, Engine, World, Entity
 
 class GameWorld(World):
 	def __init__(self):
 		super().__init__()
+		game_entity = GameEntity()
+		self.add(game_entity)
+
+
+class GameEntity(Entity):
+	def __init__(self):
+		super().__init__()
+
+	def added(self):
+		print('added')
+
+	def update(self):
+		print('update')
 
 
 if __name__ == '__main__':
