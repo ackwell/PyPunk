@@ -10,11 +10,14 @@ class PP(object):
 	height = 0
 	assigned_frame_rate = 0
 	title = ''
+	elapsed = 0
+	frame_rate = 0
 
 	engine = None
 	screen = None
 	bounds = None
 	_world = None
+	_goto = None
 
 
 class Engine(object):
@@ -22,11 +25,12 @@ class Engine(object):
 	
 	def __init__(self, width, height, frame_rate=60, title="PyPunk"):
 		# Public variables
-		paused         = False
-		max_elapsed    = 0.0333
+		self.paused         = False
+		self.max_elapsed    = 0.0333
 
 		# Private variables
 		self._running = True
+		self._clock = sfml.Clock()
 
 		# Set global game properties
 		PP.width = width
@@ -39,29 +43,77 @@ class Engine(object):
 		PP.screen = Screen()
 		PP.bounds = Rectangle(0, 0, width, height)
 		PP._world = World()
-		#camera goes here
+		PP.camera = PP._world.camera
 		#reset draw target?
+
+		# Set FPS limit
+		PP.screen.framerate_limit = PP.assigned_frame_rate
 
 		# Bind input and close events
 		Input._bind_events()
 		EventManager.register_event(sfml.Event.CLOSED, self.close)
 
 	def begin(self):
+		# Switch worlds
+		if (PP._goto):
+			self._check_world()
+
+		# Reset the clock just before starting the frame loop
+		self._clock.restart()
+
 		while self._running:
-			# Clear the previous states, then dispatch Events
+			# Set some variables
+			try:
+				PP.elapsed = self._clock.elapsed_time.as_seconds()
+				PP.frame_rate = 1/PP.elapsed
+			except ZeroDivisionError: pass
+			self._clock.restart()
+
 			Input._clear_key_states()
 			EventManager.dispatch_events(PP.screen)
+
+			#Update console?
+			if not self.paused:
+				self.update()
+				self.render()
 
 		PP.screen.close()
 
 	def update(self):
-		pass
+		#PP._world.update_lists()
+		if PP._goto:
+			self._check_world()
+		#if PP.tweener.active and PP.tweener._tween:
+		#	PP.tweener.update_tweens()
+		if PP._world.active:
+			#if PP._world._tween:
+			#	PP._world.update_tweens()
+			PP._world.update()
 
 	def render(self):
-		pass
+		# reset Draw target?
+		PP.screen.clear() # SET BG COLOUR HERE
+		if PP._world.visible:
+			PP._world.render()
+		PP.screen.display()
 
 	def close(self, event=None):
 		self._running = False
+
+	def _check_world(self):
+		if not PP._goto:
+			return
+
+		PP._world.end()
+		#PP._world.update_lists()
+		#if PP._world and PP._world.auto_clear and PP._world._tween:
+		#	PP._world.clear_tweens()
+		PP._world = PP._goto
+		PP._goto = None
+		PP.camera = PP._world.camera
+		#PP._world.update_lists()
+		PP._world.begin()
+		#PP._world.update_lists()
 
 
 class Tweener(object):
@@ -83,12 +135,10 @@ class World(Tweener):
 		self.camera = Point()
 
 	# Called when the world is switched to
-	def begin(self):
-		pass
+	def begin(self): pass
 
 	# Called when the world is switched away from
-	def end(self):
-		pass
+	def end(self): pass
 
 	# Called by Engine game loop. Updates contained entities.
 	def update(self):
@@ -97,6 +147,7 @@ class World(Tweener):
 
 	# Called by Engine game loop. Renders contained entities
 	def render(self):
+		# Render wntities
 		pass
 
 
