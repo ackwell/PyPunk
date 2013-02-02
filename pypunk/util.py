@@ -5,17 +5,26 @@ Key = sfml.Keyboard
 Event = sfml.Event
 
 
-class Input(object):
+# Singleton factory class so I can have property classmethods and such
+class Singleton(object):
+	_instance = None
+	def __new__(cls, *args, **kwargs):
+		if not cls._instance:
+			cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
+		return cls._instance
+
+
+class _input(Singleton):
 	key_register = {}
 
 	# Called by the Engine to set up initial event bindings
-	@classmethod
+	#@classmethod
 	def _bind_events(cls):
 		EventManager.register_event(Event.KEY_PRESSED, cls._on_key_pressed)
 		EventManager.register_event(Event.KEY_RELEASED, cls._on_key_released)
 
 	# Private callback functions
-	@classmethod
+	#@classmethod
 	def _on_key_pressed(cls, event):
 		# Make sure there's an registry entry
 		if event.code not in cls.key_register:
@@ -25,7 +34,7 @@ class Input(object):
 		if not key['down']:
 			key['down'] = key['pressed'] = True
 
-	@classmethod
+	#@classmethod
 	def _on_key_released(cls, event):
 		if event.code not in cls.key_register:
 			cls.key_register[event.code] = {'pressed':False, 'released':False, 'down':False}
@@ -35,17 +44,18 @@ class Input(object):
 			key['released'] = True
 
 	# Clear the Pressed/Released state of the variables
-	@classmethod
+	#@classmethod
 	def _clear_key_states(cls):
 		for key in cls.key_register.values():
 			key['pressed'] = key['released'] = False
+Input = _input()
 
 
-class EventManager(object):
+class _event_manager(Singleton):
 	event_register = {}
 
 	# Register a callback function to an event
-	@classmethod
+	#@classmethod
 	def register_event(cls, event, callback):
 		if event not in cls.event_register:
 			cls.event_register[event] = []
@@ -54,7 +64,7 @@ class EventManager(object):
 	# Will probably need a dereg function at some point
 
 	# Dispatch all waiting events for specified screen object
-	@classmethod
+	#@classmethod
 	def dispatch_events(cls, screen):
 		for event in screen.iter_events():
 			# Check if the event is in the register, if it is, execute callbacks
@@ -63,3 +73,4 @@ class EventManager(object):
 					callback(event)
 					# According to my old code, might have to do some fancy stuff
 					# here to dereg stuff
+EventManager = _event_manager()

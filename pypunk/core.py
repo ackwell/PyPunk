@@ -1,9 +1,9 @@
 import sfml
 from .geom import Rectangle, Point
-from .util import Input, EventManager
+from .util import Input, EventManager, Singleton
 
 
-class PP(object):
+class PP(Singleton):
 	"Static class to access global properties and functions"
 	# Init variables as a safeguard
 	width = 0
@@ -17,7 +17,7 @@ class PP(object):
 	screen = None
 	bounds = None
 	_world = None
-	_goto = None
+	_goto = None 
 
 
 class Engine(object):
