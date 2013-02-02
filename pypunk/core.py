@@ -383,7 +383,7 @@ class Entity(Tweener):
 		self.height = 0
 		self.origin_x = 0
 		self.origin_y = 0
-		#rendertarget?
+		self.render_target = None
 
 		# Private variables
 		self._class = self.__class__.__name__
@@ -416,9 +416,9 @@ class Entity(Tweener):
 				self._point.y = self.y
 			else:
 				self._point.x = self._point.y = 0
-			self._camera.x = self._world.camera.x if _world else PP.camera.x
-			self._camera.y = self._world.camera.y if _world else PP.camera.y
-			# RENDER GRAPHIC
+			self._camera.x = self._world.camera.x if self._world else PP.camera.x
+			self._camera.y = self._world.camera.y if self._world else PP.camera.y
+			self._graphic.render(self.render_target if self.render_target else PP.screen, self._point, self._camera)
 
 	# COLLISION FUNCTIONS
 
@@ -445,7 +445,7 @@ class Entity(Tweener):
 	layer = property(lambda self:self._layer, _set_layer)
 
 	def _set_type(self, value):
-		if self_type == value:
+		if self.type == value:
 			return
 		if not self._world:
 			self._type = value
@@ -455,8 +455,19 @@ class Entity(Tweener):
 		self._type = value
 		if self._type:
 			self._world.add_type(self)
-	# Bad code, i know. SOWEEEE
+	# Bad code, i know. SOWEEEE (using 'type' as a variable)
 	type = property(lambda self:self._type, _set_type)
+
+	def _set_graphic(self, g):
+		if self._graphic == g:
+			return
+		self._graphic = g
+		if g and g.assign != None:
+			g.assign()
+	graphic = property(lambda self:self._graphic, _set_graphic)
+
+	def add_graphic(g):
+		raise NotImplementedError()
 
 	# SET HITBOX, ETC
 
