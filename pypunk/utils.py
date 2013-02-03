@@ -56,8 +56,8 @@ class _input(Singleton):
 			if _input not in cls._key_groups:
 				return False
 			for k in cls._key_groups[_input]:
-				if _input in cls._key_register:
-					if cls._key_register[_input][action]:
+				if k in cls._key_register:
+					if cls._key_register[k][action]:
 						return True
 			return False
 		if _input in cls._key_register:
