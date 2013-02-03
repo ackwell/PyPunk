@@ -108,7 +108,7 @@ class Engine(object):
 
 	def render(self):
 		# reset Draw target?
-		PP.screen.clear() # SET BG COLOUR HERE
+		PP.screen.clear(PP.screen._color)
 		if PP._world.visible:
 			PP._world.render()
 		PP.screen.display()
@@ -491,3 +491,13 @@ class Entity(Tweener):
 class Screen(sfml.RenderWindow):
 	def __init__(self):
 		super().__init__(sfml.VideoMode(PP.width, PP.height), PP.title)
+		self._color = sfml.Color(0, 0, 0)
+
+	def _set_color(self, value):
+		r = value & 255
+		g = (value >> 8) & 255
+		b = (value >> 16) & 255
+		self._color = sfml.Color(r, g, b)
+	def _get_color(self):
+		return self._color.r*65536 + self._color.g*256 + self._color.b
+	color = property(_get_color, _set_color)
