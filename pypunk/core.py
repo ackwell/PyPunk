@@ -1,7 +1,7 @@
 import sfml
 from . import graphics
 from .geom import Rectangle, Point
-from .util import Input, EventManager, Singleton
+from .utils import Input, EventManager, Singleton
 
 
 # Errors
@@ -86,7 +86,7 @@ class Engine(object):
 			except ZeroDivisionError: pass
 			self._clock.restart()
 
-			Input._clear_key_states()
+			Input._clear_states()
 			EventManager.dispatch_events(PP.screen)
 
 			#Update console?
@@ -497,3 +497,6 @@ class Screen(sfml.RenderWindow):
 	def _set_color(self, value):
 		self._color = graphics.hex2color(value)
 	color = property(lambda self: graphics.color2hex(self._color), _set_color)
+
+	mouse_x = property(lambda _:Input.mouse_x)
+	mouse_y = property(lambda _:Input.mouse_y)
