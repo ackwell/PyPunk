@@ -26,10 +26,10 @@ class Image(Graphic):
 	def __init__(self, source, clip_rect=None, cache=True):
 		super().__init__()
 		
-		# Public Variables
+		# Private Variables
 		self._scale = 1
-		#self.scale_x = 1
-		#self.scale_y = 1
+		self._scale_x = 1
+		self._scale_y = 1
 
 		# get the pixels in case I need them down the road (pixel perfect, etc)
 		texture, self.pixels = get_image(source, cache)
@@ -49,22 +49,24 @@ class Image(Graphic):
 		# Draw eet
 		target.draw(self.sprite)
 
+	# Transform functions
 	def _set_angle(self, value):
 		self.sprite.rotation = value
 	angle = property(lambda self: self.sprite.rotation, _set_angle)
 
 	def _set_scale_x(self, value):
+		self._scale_x = value
 		self.sprite.scale = (value*self._scale, self.sprite.scale[1])
 	scale_x = property(lambda self: self.sprite.scale[0], _set_scale_x)
 
 	def _set_scale_y(self, value):
+		self.scale_y = value
 		self.sprite.scale = (self.sprite.scale[0], value*self._scale)
 	scale_y = property(lambda self: self.sprite.scale[1], _set_scale_y)
 
 	def _set_scale(self, value):
 		self._scale = value
-		scale = self.sprite.scale
-		self.sprite.scale = (scale[0]*value, scale[1]*value)
+		self.sprite.scale = (self._scale_x*value, self._scale_y*value)
 	scale = property(lambda self: self._scale, _set_scale)
 
 	def _set_origin_x(self, value):
@@ -82,6 +84,14 @@ class Image(Graphic):
 	def _set_smooth(self, value):
 		self.sprite.texture.smooth = value
 	smooth = property(lambda self: self.sprite.texture.smooth, _set_smooth)
+
+	# Color Tinting, etc
+	def _set_alpha(self, value):
+		value = min(1, max(0, value))
+		color = self.sprite.color
+		color.a = value*255
+		self.sprite.color = color
+	alpha = property(lambda self: self.sprite.color.a/255, _set_alpha)
 
 
 image_cache = {}

@@ -16,13 +16,15 @@ class GameEntity(Entity):
 		super().__init__()
 		self.x = 100
 		self.y = 100
-		self.graphic = Image('EntityImage.png', Rectangle(1, 1, 20, 20))
+		self.graphic = Image('EntityImage.png')
 		self.graphic.center_origin()
-		self.graphic.scale_y = 2
-		self.graphic.scale = 0.5
+		self.graphic.smooth = True
+		self.graphic.scale = 1.5
 
 	def update(self):
-		pass#self.graphic.angle += 1
+		self.graphic.alpha = (self.graphic.alpha + 0.02)%1
+		self.graphic.scale = (self.graphic.scale-1 + 0.1)%2 + 1
+		print(self.graphic.scale)
 
 
 if __name__ == '__main__':
