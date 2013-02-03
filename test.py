@@ -20,11 +20,12 @@ class GameEntity(Entity):
 		self.graphic.center_origin()
 		self.graphic.smooth = True
 		self.graphic.scale = 1.5
+		self.graphic.color = 0x336699
+
+		print(self.graphic.clip_rect.height)
 
 	def update(self):
-		self.graphic.alpha = (self.graphic.alpha + 0.02)%1
-		self.graphic.scale = (self.graphic.scale-1 + 0.1)%2 + 1
-		print(self.graphic.scale)
+		pass
 
 
 if __name__ == '__main__':

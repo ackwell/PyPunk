@@ -1,5 +1,5 @@
 import sfml
-from .geom import Point
+from .geom import Point, Rectangle
 
 
 class Graphic(object):
@@ -93,6 +93,31 @@ class Image(Graphic):
 		self.sprite.color = color
 	alpha = property(lambda self: self.sprite.color.a/255, _set_alpha)
 
+	def _set_color(self, value):
+		color = hex2color(value)
+		color.a = self.sprite.color.a
+		self.sprite.color = color
+	color = property(lambda self: color2hex(self.sprite.color), _set_color)
+
+	# Size information
+	width = property(lambda self:self.sprite.get_texture_rect().width)
+	height = property(lambda self:self.sprite.get_texture_rect().height)
+	scaled_width = property(lambda self:self.sprite.get_texture_rect().width*self._scale_x*self._scale)
+	scaled_height = property(lambda self:self.sprite.get_texture_rect().height*self._scale_y*self._scale)
+	def _get_clip_rect(self):
+		 tr = self.sprite.get_texture_rect()
+		 return Rectangle(tr.left, tr.top, tr.width, tr.height)
+	clip_rect = property(_get_clip_rect)
+
+
+# Utility functions + Caching
+def hex2color(_hex):
+	b = _hex & 255
+	g = (_hex >> 8) & 255 
+	r = (_hex >> 16) & 255
+	return sfml.Color(r, g, b)
+def color2hex(color):
+	return color.r*65536 + color.g*256 + color.b
 
 image_cache = {}
 def get_image(loc, cache):

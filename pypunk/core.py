@@ -1,4 +1,5 @@
 import sfml
+from . import graphics
 from .geom import Rectangle, Point
 from .util import Input, EventManager, Singleton
 
@@ -494,10 +495,5 @@ class Screen(sfml.RenderWindow):
 		self._color = sfml.Color(0, 0, 0)
 
 	def _set_color(self, value):
-		r = value & 255
-		g = (value >> 8) & 255
-		b = (value >> 16) & 255
-		self._color = sfml.Color(r, g, b)
-	def _get_color(self):
-		return self._color.r*65536 + self._color.g*256 + self._color.b
-	color = property(_get_color, _set_color)
+		self._color = graphics.hex2color(value)
+	color = property(lambda self: graphics.color2hex(self._color), _set_color)
