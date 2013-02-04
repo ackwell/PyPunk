@@ -97,7 +97,7 @@ class Engine(object):
 		PP.screen.close()
 
 	def update(self):
-		PP._world.update_lists()
+		PP._world._update_lists()
 		if PP._goto:
 			self._check_world()
 		#if PP.tweener.active and PP.tweener._tween:
@@ -122,15 +122,15 @@ class Engine(object):
 			return
 
 		PP._world.end()
-		PP._world.update_lists()
+		PP._world._update_lists()
 		if PP._world and PP._world.auto_clear and PP._world._tween:
 			PP._world.clear_tweens()
 		PP._world = PP._goto
 		PP._goto = None
 		PP.camera = PP._world.camera
-		PP._world.update_lists()
+		PP._world._update_lists()
 		PP._world.begin()
-		PP._world.update_lists()
+		PP._world._update_lists()
 
 
 class Tweener(object):
@@ -259,7 +259,6 @@ class Tween(object):
 	scale = property(lambda self:self._t)
 
 
-
 class World(Tweener):
 	def __init__(self):
 		super().__init__()
@@ -275,6 +274,7 @@ class World(Tweener):
 		# Layers/types
 		self._layers = {}
 		self._types = {}
+		self._entity_names = {}
 
 	# Called when the world is switched to
 	def begin(self): pass
@@ -301,8 +301,8 @@ class World(Tweener):
 			for e in self._layers[layer]:
 				yield e
 
-	#mouse_x = property(lambda self:PP.screen.mouse_x+self.camera.x)
-	#mouse_y = property(lambda self:PP.screen.mouse_y+self.camera.y)
+	mouse_x = property(lambda self:PP.screen.mouse_x+self.camera.x)
+	mouse_y = property(lambda self:PP.screen.mouse_y+self.camera.y)
 
 	def add(self, e):
 		self._add.append(e)
@@ -331,44 +331,55 @@ class World(Tweener):
 		for e in entities:
 			self.remove(e)
 
-	def update_lists(self):
+	def _update_lists(self):
 		# Remove entities
 		for e in self._remove:
-			self.remove_layer(e)
-			if e.type != '':
-				self.remove_type(e)
 			e.removed()
 			e._world = None
+			self._remove_layer(e)
+			if e._type != '':
+				self._remove_type(e)
+			if e._name != '':
+				self._unregister_name(e)
 		self._remove = []
 
 		# Add entities
 		for e in self._add:
 			# Add to the update/render whatsit
-			self.add_layer(e)
-			# If it has a type, add it to the typelist
-			if e.type != '':
-				self.add_type(e)
+			self._add_layer(e)
+			# If it has a type, add it to the typelist, likewise for name
+			if e._type != '':
+				self._add_type(e)
+			if e._name != '':
+				self._register_name(e)
 			e._world = self
 			e.added()
 		self._add = []
 
-	def add_layer(self, e):
+	def _add_layer(self, e):
 		if e.layer not in self._layers:
 			self._layers[e.layer] = []
 		self._layers[e.layer].append(e) 
 
-	def add_type(self, e):
+	def _add_type(self, e):
 		if e.type not in self._types:
 			self._types[e.type] = []
 		self._types[e.type].append(e)
 
-	def remove_layer(self, e):
+	def _register_name(self, e):
+		self._entity_names[e._name] = e
+
+	def _remove_layer(self, e):
 		# Possibly need to catch error? (according to old code)
 		self._layers[e.layer].remove(e)
 
-	def remove_type(self, e):
+	def _remove_type(self, e):
 		if e.type:
 			self._types[e.type].remove(e)
+
+	def _unregister_name(self, e):
+		if e._name in self._entity_names and self._entity_names[e._name] == e:
+			del self._entity_names[e._name]
 
 
 class Entity(Tweener):
@@ -440,9 +451,9 @@ class Entity(Tweener):
 		if not self._world:
 			self._layer = value
 			return
-		self._world.remove_layer(self)
+		self._world._remove_layer(self)
 		self._layer = value
-		self._world.add_layer(self)
+		self._world._add_layer(self)
 	layer = property(lambda self:self._layer, _set_layer)
 
 	def _set_type(self, value):
@@ -452,10 +463,10 @@ class Entity(Tweener):
 			self._type = value
 			return
 		if self._type:
-			self._world.remove_type(self)
+			self._world._remove_type(self)
 		self._type = value
 		if self._type:
-			self._world.add_type(self)
+			self._world._add_type(self)
 	# Bad code, i know. SOWEEEE (using 'type' as a variable)
 	type = property(lambda self:self._type, _set_type)
 
@@ -483,7 +494,15 @@ class Entity(Tweener):
 
 	# MOVE FUNCTIONS
 
-	# GET/SET NAME. I CEEBS RIGHT NOW
+	def _set_name(self, value):
+		if self._name == value:
+			return
+		if self._name and self._world:
+			self._world._unregister_name(self)
+		self._name = value
+		if self._name and self._world:
+			self._world._register_name(self)
+	name = property(lambda self: self._name, _set_name)
 
 	def get_class(self):
 		return self._class
@@ -492,7 +511,7 @@ class Entity(Tweener):
 class Screen(sfml.RenderWindow):
 	def __init__(self):
 		super().__init__(sfml.VideoMode(PP.width, PP.height), PP.title)
-		self._color = sfml.Color(0, 0, 0)
+		self._color = sfml.Color(32, 32, 32)
 
 	def _set_color(self, value):
 		self._color = graphics.hex2color(value)

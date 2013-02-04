@@ -6,7 +6,6 @@ from pypunk.utils import Input, Key
 class GameWorld(World):
 	def __init__(self):
 		super().__init__()
-		PP.screen.color = 0x202020
 		game_entity = GameEntity()
 		self.add(game_entity)
 
