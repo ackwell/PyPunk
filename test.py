@@ -6,8 +6,16 @@ from pypunk.utils import Input, Key
 class GameWorld(World):
 	def __init__(self):
 		super().__init__()
-		game_entity = GameEntity()
-		self.add(game_entity)
+		self.game_entity = GameEntity()
+		self.add(self.game_entity)
+
+		self.add_graphic(Image('EntityImage.png'))
+
+	def begin(self):
+		self.bring_forward(self.game_entity)
+		print(self.is_at_front(self.game_entity))
+		self.send_backward(self.game_entity)
+		print(self.is_at_back(self.game_entity))
 
 
 class GameEntity(Entity):

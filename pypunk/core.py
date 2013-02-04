@@ -331,6 +331,59 @@ class World(Tweener):
 		for e in entities:
 			self.remove(e)
 
+	def add_graphic(self, graphic, layer=0, x=0, y=0):
+		e = Entity(x, y, graphic)
+		if layer != 0:
+			e.layer = 0
+		e.active = False
+		return self.add(e)
+
+	# ADD_MASK
+
+	def bring_to_front(self, e):
+		if self.is_at_front(e):
+			return False
+		layer = self._layers[e.layer]
+		layer.remove(e)
+		layer.append(e)
+
+	def send_to_back(self, e):
+		if self.is_at_back(e):
+			return False
+		layer = self._layers[e.layer]
+		layer.remove(e)
+		layer.insert(0, e)
+
+	def bring_forward(self, e):
+		if self.is_at_front(e):
+			return False
+		layer = self._layers[e.layer]
+		i = layer.index(e)
+		layer.remove(e)
+		layer.insert(i+1, e)
+
+	def send_backward(self, e):
+		if self.is_at_back(e):
+			return False
+		layer = self._layers[e.layer]
+		i = layer.index(e)
+		layer.remove(e)
+		layer.insert(i-1, e)
+
+	def is_at_front(self, e):
+		if e._world != self:
+			return False
+		if self._layers[e.layer].index(e) == len(self._layers[e.layer])-1:
+			return True
+		return False
+
+	def is_at_back(self, e):
+		if e._world != self:
+			return False
+		if self._layers[e.layer].index(e) == 0:
+			return True
+		return False
+
 	def _update_lists(self):
 		# Remove entities
 		for e in self._remove:
