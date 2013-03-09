@@ -36,7 +36,6 @@ class GameEntity(Entity):
 		self._time_interval = 0
 
 	def update(self):
-		self.graphic.update() #needs fixing
 		self._time_interval += PP.elapsed
 		if self._time_interval >= 3:
 			self.graphic.play('Blinking')

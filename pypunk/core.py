@@ -290,6 +290,8 @@ class World(Tweener):
 				if e._tween:
 					e.update_tweens()
 				e.update()
+			if e._graphic and e._graphic.active:
+				e._graphic.update()
 
 	# Called by Engine game loop. Renders contained entities
 	def render(self):
