@@ -37,6 +37,7 @@ class _pp(Singleton):
 	rect = Rectangle()
 PP = _pp()
 
+
 class Engine(object):
 	"Main game class. Manages game loop."
 	
@@ -383,6 +384,10 @@ class World(Tweener):
 		if self._layers[e.layer].index(e) == 0:
 			return True
 		return False
+
+	# COLLIDE FUNCTIONS
+
+	# ENTITY FINDING FUNCTIONS
 
 	def _update_lists(self):
 		# Remove entities
