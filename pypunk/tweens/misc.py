@@ -28,8 +28,8 @@ class AngleTween(Tween):
 		d = to_angle - self.angle
 		a = abs(d)
 		if a > 181:
-			self._range = (360 0 a) * (-1 if d > 0 else 1)
-		else if a < 179:
+			self._range = (360 - a) * (-1 if d > 0 else 1)
+		elif a < 179:
 			self._range = d
 		else:
 			self._range = PP.choose(180, -180)
@@ -85,9 +85,9 @@ class ColorTween(Tween):
 	def update(self):
 		super().update()
 		self.alpha = self._start_a + self._range_a * self._t
-		self._r = int((self_start_r + self._range_r * self._t) * 255)
-		self._g = int((self_start_g + self._range_g * self._t) * 255)
-		self._b = int((self_start_b + self._range_b * self._t) * 255)
+		self._r = int((self._start_r + self._range_r * self._t) * 255)
+		self._g = int((self._start_g + self._range_g * self._t) * 255)
+		self._b = int((self._start_b + self._range_b * self._t) * 255)
 		self.color = self._r << 16 | self._g << 8 | self._b
 
 	red = property(lambda self: self._r)
