@@ -2,6 +2,7 @@ import sfml
 from . import graphics
 from .geom import Rectangle, Point
 from .utils import Input, EventManager, Singleton
+from .debug import Console
 
 
 # Errors
@@ -10,25 +11,35 @@ class PyPunkError(Exception): pass
 
 class _pp(Singleton):
 	"Static class to access global properties and functions"
-	# Init variables as a safeguard
-	width = 0
-	height = 0
-	assigned_frame_rate = 0
-	title = ''
-	elapsed = 0
-	frame_rate = 0
+	def __init__(cls):
+		# Init variables as a safeguard
+		width = 0
+		height = 0
+		assigned_frame_rate = 0
+		title = ''
+		elapsed = 0
+		frame_rate = 0
 
-	engine = None
-	screen = None
-	bounds = None
-	_world = None
-	_goto = None
+		engine = None
+		screen = None
+		bounds = None
+
+		_world = None
+		_goto = None
+
+		_console = None
 
 	def _set_world(cls, world):
 		if cls._world == world:
 			return
 		cls._goto = world
 	world = property(lambda cls:cls._world, _set_world)
+
+	def _get_console(cls):
+		if not cls._console:
+			cls._console = Console()
+		return cls._console
+	console = property(_get_console)
 
 	# Global objects for rendering/collision/etc
 	point = Point()
