@@ -33,18 +33,20 @@ class Image(Graphic):
 		self._scale_x = 1
 		self._scale_y = 1
 
-		# get the pixels in case I need them down the road (pixel perfect, etc)
-		texture, self.pixels = get_image(source, cache)
-		self.sprite = sfml.Sprite(texture)
+		# Might be no source (Shapes, etc)
+		if source:
+			# Set the pixels in case I need them down the road (pixel perfect, etc)
+			texture, self.pixels = get_image(source, cache)
+			self.sprite = sfml.Sprite(texture)
 
-		# Set the cliprect if it's been passed
-		_source_rect = self.sprite.local_bounds
-		if clip_rect:
-			if not clip_rect.width:
-				clip_rect.width = _source_rect.width
-			if not clip_rect.height:
-				clip_rect.height = _source_rect.height
-			self.sprite.set_texture_rect(clip_rect)
+			# Set the cliprect if it's been passed
+			_source_rect = self.sprite.local_bounds
+			if clip_rect:
+				if not clip_rect.width:
+					clip_rect.width = _source_rect.width
+				if not clip_rect.height:
+					clip_rect.height = _source_rect.height
+				self.sprite.set_texture_rect(clip_rect)
 
 	def render(self, target, point, camera):
 		self._point.x = point.x + self.x - self.origin_x - camera.x * self.scroll_x
@@ -55,6 +57,17 @@ class Image(Graphic):
 
 		# Draw eet
 		target.draw(self.sprite)
+
+	# Some static methods for compatibility with original FP API
+	@staticmethod
+	def create_rect(width, height, color=0xFFFFFF, alpha=1):
+		shape = RectangleShape(width, height, color, alpha)
+		return shape
+
+	@staticmethod
+	def create_circle(radius, color=0xFFFFFF, alpha=1):
+		shape = CircleShape(radius, color, alpha)
+		return shape
 
 	# Transform functions
 	def _set_angle(self, value):
@@ -115,6 +128,39 @@ class Image(Graphic):
 		 tr = self.sprite.get_texture_rect()
 		 return Rectangle(tr.left, tr.top, tr.width, tr.height)
 	clip_rect = property(_get_clip_rect)
+
+
+class ShapeMixin(object):
+	# Need to redefine color/alpha due to slightly different API (color -> fill_color)
+	def _set_alpha(self, value):
+		value = min(1, max(0, value))
+		color = self.sprite.fill_color
+		color.a = value*255
+		self.sprite.fill_color = color
+	alpha = property(lambda self: self.sprite.fill_color.a/255, _set_alpha)
+
+	def _set_color(self, value):
+		color = hex2color(value)
+		color.a = self.sprite.fill_color.a
+		self.sprite.fill_color = color
+	color = property(lambda self: color2hex(self.sprite.fill_color), _set_color)
+
+
+class RectangleShape(ShapeMixin, Image):
+	def __init__(self, width, height, color=0xFFFFFF, alpha=1):
+		super().__init__(None)
+		# I know, it's not a sprite. Whatever.
+		self.sprite = sfml.RectangleShape((width, height))
+		self.color = color
+		self.alpha = alpha
+
+
+class CircleShape(ShapeMixin, Image):
+	def __init__(self, radius, color=0xFFFFFF, alpha=1):
+		super().__init__(None)
+		self.sprite = sfml.CircleShape(radius)
+		self.color = color
+		self.alpha = alpha
 
 
 class Spritemap(Image):

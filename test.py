@@ -12,6 +12,11 @@ class GameWorld(World):
 
 		self.add_graphic(Image('EntityImage2.png'), 0, 50, 50)
 
+		test = Image.create_rect(100, 100, 0x993333, 0.75)
+		test.x = 200
+		test.y = 200
+		self.add_graphic(test)
+
 
 class GameEntity(Entity):
 	def __init__(self):
