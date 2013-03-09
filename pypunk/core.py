@@ -1,3 +1,4 @@
+import random
 import sfml
 from . import graphics
 from .geom import Rectangle, Point
@@ -34,6 +35,10 @@ class _pp(Singleton):
 			return
 		cls._goto = world
 	world = property(lambda cls:cls._world, _set_world)
+
+	def choose(cls, *objs):
+		c = objs[0] if len(objs) == 1 and isinstance(objs[0], list) else objs
+		return random.choice(c)
 
 	def _get_console(cls):
 		if not cls._console:
