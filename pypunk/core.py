@@ -1,3 +1,4 @@
+import math
 import random
 import sfml
 from . import graphics
@@ -14,21 +15,31 @@ class _pp(Singleton):
 	"Static class to access global properties and functions"
 	def __init__(cls):
 		# Init variables as a safeguard
-		width = 0
-		height = 0
-		assigned_frame_rate = 0
-		title = ''
-		elapsed = 0
-		frame_rate = 0
+		cls.width = 0
+		cls.height = 0
+		cls.assigned_frame_rate = 0
+		cls.title = ''
+		cls.elapsed = 0
+		cls.frame_rate = 0
 
-		engine = None
-		screen = None
-		bounds = None
+		cls.engine = None
+		cls.screen = None
+		cls.bounds = None
 
-		_world = None
-		_goto = None
+		cls._world = None
+		cls._goto = None
 
-		_console = None
+		cls._console = None
+
+		# Rad/deg conversion
+		cls.DEG = -180 / math.pi
+		cls.RAD = math.pi / -180
+
+		# Global objects for rendering/collision/etc
+		cls.point = Point()
+		cls.point2 = Point()
+		cls.zero = Point()
+		cls.rect = Rectangle()
 
 	def _set_world(cls, world):
 		if cls._world == world:
@@ -45,12 +56,6 @@ class _pp(Singleton):
 			cls._console = Console()
 		return cls._console
 	console = property(_get_console)
-
-	# Global objects for rendering/collision/etc
-	point = Point()
-	point2 = Point()
-	zero = Point()
-	rect = Rectangle()
 PP = _pp()
 
 
