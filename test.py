@@ -1,6 +1,6 @@
 from pypunk.core import PP, Engine, World, Entity, Tween
 from pypunk.graphics import Image, Spritemap
-from pypunk.utils import Input, Key
+from pypunk.utils import Input, Key, Ease
 from pypunk.geom import Rectangle
 from pypunk.tweens.misc import ColorTween
 
@@ -15,7 +15,7 @@ class GameWorld(World):
 
 		self.colortween = ColorTween(_type = Tween.LOOPING)
 		self.add_tween(self.colortween)
-		self.colortween.tween(5, 0xFF0000, 0x0000FF)
+		self.colortween.tween(5, 0xFF0000, 0x0000FF, ease=Ease.bounce_in_out)
 
 		self.test = Image.create_rect(100, 100, 0x993333, 0.75)
 		self.test.x = 200
