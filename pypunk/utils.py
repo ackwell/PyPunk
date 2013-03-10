@@ -194,24 +194,24 @@ class _ease(Singleton):
 		cls.B6 = 2.625 / 2.75
 
 	# QUAD #
-	def quad_in(cls, t): return t*t
+	def quad_in(cls, t): return t**2
 	def quad_out(cls, t): return -t*(t-2)
-	def quad_in_out(cls, t): t2=t-1; return t*t*2 if t<=0.5 else 1-t2*t2*2
+	def quad_in_out(cls, t): t2=t-1; return t**2*2 if t<=0.5 else 1-t2**2*2
 
 	# CUBIC #
-	def cube_in(cls, t): return t*t*t
-	def cube_out(cls, t): t-=1; return 1+t*t*t
-	def cube_in_out(cls, t): t2=t-1; return t*t*t*4 if t<=0.5 else 1+t2*t2*t2*4
+	def cube_in(cls, t): return t**3
+	def cube_out(cls, t): t-=1; return 1+t**3
+	def cube_in_out(cls, t): t2=t-1; return t**3*4 if t<=0.5 else 1+t2**3*4
 
 	# QUART #
-	def quart_in(cls, t): return t*t*t*t
-	def quart_out(cls, t): t-=1; return 1-t*t*t*t
-	def quart_in_out(cls, t): t2=t*2-2; return t*t*t*t*8 if t<=0.5 else (1-t2*t2*t2*t2)/2+0.5
+	def quart_in(cls, t): return t**4
+	def quart_out(cls, t): t-=1; return 1-t**4
+	def quart_in_out(cls, t): t2=t*2-2; return t**4*8 if t<=0.5 else (1-t2**4)/2+0.5
 
 	# QUINT #
-	def quint_in(cls, t): return t*t*t*t*t
-	def quint_out(cls, t): t=-1; return t*t*t*t*t+1
-	def quint_in_out(cls, t): t*=2; t2=t-2; return (t*t*t*t*t)/2 if t<1 else (t2*t2*t2*t2*t2+2)/2
+	def quint_in(cls, t): return t**5
+	def quint_out(cls, t): t=-1; return t**5+1
+	def quint_in_out(cls, t): t*=2; t2=t-2; return (t**5)/2 if t<1 else (t2**5+2)/2
 
 	# SINE #
 	def sine_in(cls, t): return -math.cos(cls.PI2*t)+1
@@ -221,24 +221,24 @@ class _ease(Singleton):
 	# BOUNCE #
 	def bounce_in(cls, t):
 		t=1-t
-		if t<cls.B1: return 1-7.5625*t*t;
+		if t<cls.B1: return 1-7.5625*t**2;
 		if t<cls.B2: return 1-(7.5625*(t-cls.B3)*(t-cls.B3)+0.75)
 		if t<cls.B4: return 1-(7.5625*(t-cls.B5)*(t-cls.B5)+0.9375)
 		return 1-(7.5625*(t-cls.B6)*(t-cls.B6)+0.984375)
 	def bounce_out(cls, t):
-		if t<cls.B1: return 7.5625*t*t;
+		if t<cls.B1: return 7.5625*t**2;
 		if t<cls.B2: return 7.5625*(t-cls.B3)*(t-cls.B3)+0.75
 		if t<cls.B4: return 7.5625*(t-cls.B5)*(t-cls.B5)+0.9375
 		return 7.5625*(t-cls.B6)*(t-cls.B6)+0.984375
 	def bounce_in_out(cls, t):
 		if t<0.5:
 			t=1-t*2
-			if t<cls.B1: return (1-7.5625*t*t)/2
+			if t<cls.B1: return (1-7.5625*t**2)/2
 			if t<cls.B2: return (1-(7.5625*(t-cls.B3)*(t-cls.B3)+0.75))/2
 			if t<cls.B4: return (1-(7.5625*(t-cls.B5)*(t-cls.B5)+0.9375))/2
 			return (1-(7.5625*(t-cls.B6)*(t-cls.B6)+0.984375))/2
 		t=t*2-1
-		if t<cls.B1: return (7.5625*t*t)/2+0.5
+		if t<cls.B1: return (7.5625*t**2)/2+0.5
 		if t<cls.B2: return (7.5625*(t-cls.B3)*(t-cls.B3)+0.75)/2+0.5
 		if t<cls.B4: return (7.5625*(t-cls.B5)*(t-cls.B5)+0.9375)/2+0.5
 		return (7.5625*(t-cls.B6)*(t-cls.B6)+0.984375)/2+0.5
@@ -254,10 +254,10 @@ class _ease(Singleton):
 	def expo_in_out(cls, t): return math.pow(2, 10*(t*2-1))/2 if t<0.5 else (-math.pow(2, -10*(t*2-1))+2)/2
 
 	# BACK #
-	def back_in(cls, t): return t*t*(2.70158*t-1.70158)
-	def back_out(cls, t): t-=1; return 1-t*t*(-2.70158*t-1.70158)
+	def back_in(cls, t): return t**2*(2.70158*t-1.70158)
+	def back_out(cls, t): t-=1; return 1-t**2*(-2.70158*t-1.70158)
 	def back_in_out(cls, t):
 		t*=2;
-		if t<1: return t*t*(2.70158*t-1.70158)/2
-		t-=2; return (1-t*t*(-2.70158*t-1.70158))/2+0.5
+		if t<1: return t**2*(2.70158*t-1.70158)/2
+		t-=2; return (1-t**2*(-2.70158*t-1.70158))/2+0.5
 Ease = _ease()
