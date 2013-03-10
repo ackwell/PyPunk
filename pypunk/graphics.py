@@ -2,6 +2,7 @@ import math
 import random
 import sfml
 from .geom import Point, Rectangle
+from .core._pp import PP
 
 
 class Graphic(object):
@@ -165,10 +166,6 @@ class CircleShape(ShapeMixin, Image):
 
 class Spritemap(Image):
 	def __init__(self, source, frame_width=0, frame_height=0, callback=None):
-		# Importing here to prevent cyclic imports. Any better ideas?
-		from .core import PP
-		self.PP = PP
-
 		# Public variables
 		self.complete = True
 		self.callback = callback
@@ -207,7 +204,7 @@ class Spritemap(Image):
 	def update(self):
 		if self._anim and not self.complete:
 			time_add = self._anim._frame_rate * self.rate
-			time_add *= self.PP.elapsed
+			time_add *= PP.elapsed
 			self._timer += time_add
 			if self._timer >= 1:
 				while self._timer >= 1:
