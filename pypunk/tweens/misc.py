@@ -158,7 +158,7 @@ class MultiVarTween(Tween):
 		self._range = []
 		self._target = duration
 		self._ease = ease
-		for k, v in values:
+		for k, v in values.values():
 			if not _object.hasattr(k):
 				raise PyPunkError('The Object does not have the property "' + k + '".')
 			self._vars.append(k)
