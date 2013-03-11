@@ -1,28 +1,9 @@
 import math
 import random
 import sfml
-from .geom import Point, Rectangle
-from .core._pp import PP
-
-
-class Graphic(object):
-	def __init__(self):
-		# Public Variables
-		self.active = False
-		self.visible = True
-		self.x = 0
-		self.y = 0
-		self.scroll_x = 1
-		self.scroll_y = 1
-		self.relative = True
-		self.assign = None
-
-		# Private Variables
-		self._point = Point()
-
-	def update(self): pass
-
-	def render(self, target, point, camera): pass
+from ._graphic import Graphic
+from ..geom import Point, Rectangle
+from ..core._pp import PP
 
 
 class Image(Graphic):
@@ -115,10 +96,10 @@ class Image(Graphic):
 	alpha = property(lambda self: self.sprite.color.a/255, _set_alpha)
 
 	def _set_color(self, value):
-		color = hex2color(value)
+		color = self.hex2color(value)
 		color.a = self.sprite.color.a
 		self.sprite.color = color
-	color = property(lambda self: color2hex(self.sprite.color), _set_color)
+	color = property(lambda self: self.color2hex(self.sprite.color), _set_color)
 
 	# Size information
 	width = property(lambda self:self.sprite.get_texture_rect().width)
@@ -141,10 +122,10 @@ class ShapeMixin(object):
 	alpha = property(lambda self: self.sprite.fill_color.a/255, _set_alpha)
 
 	def _set_color(self, value):
-		color = hex2color(value)
+		color = self.hex2color(value)
 		color.a = self.sprite.fill_color.a
 		self.sprite.fill_color = color
-	color = property(lambda self: color2hex(self.sprite.fill_color), _set_color)
+	color = property(lambda self: self.color2hex(self.sprite.fill_color), _set_color)
 
 
 class RectangleShape(ShapeMixin, Image):
@@ -310,15 +291,6 @@ class Anim:
 	frame_count = property(lambda self: self._frame_count)
 	loop = property(lambda self: self._loop)
 
-
-# Utility functions + Caching
-def hex2color(_hex):
-	b = _hex & 255
-	g = (_hex >> 8) & 255 
-	r = (_hex >> 16) & 255
-	return sfml.Color(r, g, b)
-def color2hex(color):
-	return color.r*65536 + color.g*256 + color.b
 
 image_cache = {}
 def get_image(loc, cache):
