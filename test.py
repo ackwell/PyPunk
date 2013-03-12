@@ -1,5 +1,5 @@
 from pypunk.core import PP, Engine, World, Entity, Tween
-from pypunk.graphics import Image, Spritemap, Text
+from pypunk.graphics import Image, Spritemap, Text, Graphiclist
 from pypunk.utils import Input, Key, Ease
 from pypunk.geom import Rectangle
 from pypunk.tweens.misc import ColorTween
@@ -20,10 +20,11 @@ class GameWorld(World):
 		self.test = Image.create_rect(100, 100, 0x993333, 0.75)
 		self.test.x = 200
 		self.test.y = 200
-		self.add_graphic(self.test)
 
-		self.text = Text('Hello', 100, 100, size=48)
-		self.add_graphic(self.text)
+		text = Text('Hello', 100, 100, size=48)
+
+		gl = Graphiclist(self.test, text)
+		self.add_graphic(gl)
 
 	def update(self):
 		super().update()

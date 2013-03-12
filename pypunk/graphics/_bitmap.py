@@ -1,7 +1,7 @@
 import math
 import random
 import sfml
-from ._graphic import Graphic
+from ._base import Graphic
 from ..geom import Point, Rectangle
 from ..core._pp import PP
 

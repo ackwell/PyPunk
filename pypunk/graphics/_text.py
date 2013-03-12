@@ -11,10 +11,10 @@ class Text(Image):
 	# Class variables - assigned to new Text obects
 	FONT = os.path.dirname(os.path.abspath(__file__)) + "/04B_03__.TTF"
 	SIZE = 16
-	ALIGN = "left"
-	DEFAULT_LEADING = 0
-	WORD_WRAP = False
-	RESIZEABLE = True
+	# ALIGN = "left"
+	# DEFAULT_LEADING = 0
+	# WORD_WRAP = False
+	# RESIZEABLE = True
 
 	# Not including backwards compatibility. Deal with it.
 	def __init__(self, text, x=0, y=0, **options):
@@ -26,7 +26,7 @@ class Text(Image):
 		# self._leading = Text.DEFAULT_LEADING
 		# self._word_wrap = Text.WORD_WRAP
 		# Public variables
-		self.resizeable = Text.RESIZEABLE
+		# self.resizeable = Text.RESIZEABLE
 
 		text = sfml.Text(text, get_font(Text.FONT), Text.SIZE)
 		super().__init__(text)
