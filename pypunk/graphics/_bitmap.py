@@ -15,30 +15,33 @@ class Image(Graphic):
 		self._scale_x = 1
 		self._scale_y = 1
 
-		# Might be no source (Shapes, etc)
-		if source:
+		# If it's a path to an image
+		if isinstance(source, str):
 			# Set the pixels in case I need them down the road (pixel perfect, etc)
 			texture, self.pixels = get_image(source, cache)
-			self.sprite = sfml.Sprite(texture)
+			self.drawable = sfml.Sprite(texture)
 
 			# Set the cliprect if it's been passed
-			_source_rect = self.sprite.local_bounds
+			_source_rect = self.drawable.local_bounds
 			if clip_rect:
 				if not clip_rect.width:
 					clip_rect.width = _source_rect.width
 				if not clip_rect.height:
 					clip_rect.height = _source_rect.height
-				self.sprite.set_texture_rect(clip_rect)
+				self.drawable.set_texture_rect(clip_rect)
+		# Else it might be an internal call to create a subclass
+		elif source:
+			self.drawable = source
 
 	def render(self, target, point, camera):
 		self._point.x = point.x + self.x - self.origin_x - camera.x * self.scroll_x
 		self._point.y = point.y + self.y - self.origin_y - camera.y * self.scroll_y
 
 		# position the sprite
-		self.sprite.position = (self._point.x, self._point.y)
+		self.drawable.position = (self._point.x, self._point.y)
 
 		# Draw eet
-		target.draw(self.sprite)
+		target.draw(self.drawable)
 
 	# Some static methods for compatibility with original FP API
 	@staticmethod
@@ -53,61 +56,61 @@ class Image(Graphic):
 
 	# Transform functions
 	def _set_angle(self, value):
-		self.sprite.rotation = value
-	angle = property(lambda self: self.sprite.rotation, _set_angle)
+		self.drawable.rotation = value
+	angle = property(lambda self: self.drawable.rotation, _set_angle)
 
 	def _set_scale_x(self, value):
 		self._scale_x = value
-		self.sprite.scale = (value*self._scale, self.sprite.scale[1])
-	scale_x = property(lambda self: self.sprite.scale[0], _set_scale_x)
+		self.drawable.scale = (value*self._scale, self.drawable.scale[1])
+	scale_x = property(lambda self: self.drawable.scale[0], _set_scale_x)
 
 	def _set_scale_y(self, value):
 		self.scale_y = value
-		self.sprite.scale = (self.sprite.scale[0], value*self._scale)
-	scale_y = property(lambda self: self.sprite.scale[1], _set_scale_y)
+		self.drawable.scale = (self.drawable.scale[0], value*self._scale)
+	scale_y = property(lambda self: self.drawable.scale[1], _set_scale_y)
 
 	def _set_scale(self, value):
 		self._scale = value
-		self.sprite.scale = (self._scale_x*value, self._scale_y*value)
+		self.drawable.scale = (self._scale_x*value, self._scale_y*value)
 	scale = property(lambda self: self._scale, _set_scale)
 
 	def _set_origin_x(self, value):
-		self.sprite.origin = (value, self.sprite.origin[1])
-	origin_x = property(lambda self: self.sprite.origin[0], _set_origin_x)
+		self.drawable.origin = (value, self.drawable.origin[1])
+	origin_x = property(lambda self: self.drawable.origin[0], _set_origin_x)
 
 	def _set_origin_y(self, value):
-		self.sprite.origin = (self.sprite.origin[0], value)
-	origin_y = property(lambda self: self.sprite.origin[1], _set_origin_y)
+		self.drawable.origin = (self.drawable.origin[0], value)
+	origin_y = property(lambda self: self.drawable.origin[1], _set_origin_y)
 
 	def center_origin(self):
-		tr = self.sprite.get_texture_rect()
-		self.sprite.origin = (tr.width/2, tr.height/2)
+		tr = self.drawable.get_texture_rect()
+		self.drawable.origin = (tr.width/2, tr.height/2)
 
 	def _set_smooth(self, value):
-		self.sprite.texture.smooth = value
-	smooth = property(lambda self: self.sprite.texture.smooth, _set_smooth)
+		self.drawable.texture.smooth = value
+	smooth = property(lambda self: self.drawable.texture.smooth, _set_smooth)
 
 	# Color Tinting, etc
 	def _set_alpha(self, value):
 		value = min(1, max(0, value))
-		color = self.sprite.color
+		color = self.drawable.color
 		color.a = value*255
-		self.sprite.color = color
-	alpha = property(lambda self: self.sprite.color.a/255, _set_alpha)
+		self.drawable.color = color
+	alpha = property(lambda self: self.drawable.color.a/255, _set_alpha)
 
 	def _set_color(self, value):
 		color = self.hex2color(value)
-		color.a = self.sprite.color.a
-		self.sprite.color = color
-	color = property(lambda self: self.color2hex(self.sprite.color), _set_color)
+		color.a = self.drawable.color.a
+		self.drawable.color = color
+	color = property(lambda self: self.color2hex(self.drawable.color), _set_color)
 
 	# Size information
-	width = property(lambda self:self.sprite.get_texture_rect().width)
-	height = property(lambda self:self.sprite.get_texture_rect().height)
-	scaled_width = property(lambda self:self.sprite.get_texture_rect().width*self._scale_x*self._scale)
-	scaled_height = property(lambda self:self.sprite.get_texture_rect().height*self._scale_y*self._scale)
+	width = property(lambda self:self.drawable.get_texture_rect().width)
+	height = property(lambda self:self.drawable.get_texture_rect().height)
+	scaled_width = property(lambda self:self.drawable.get_texture_rect().width*self._scale_x*self._scale)
+	scaled_height = property(lambda self:self.drawable.get_texture_rect().height*self._scale_y*self._scale)
 	def _get_clip_rect(self):
-		 tr = self.sprite.get_texture_rect()
+		 tr = self.drawable.get_texture_rect()
 		 return Rectangle(tr.left, tr.top, tr.width, tr.height)
 	clip_rect = property(_get_clip_rect)
 
@@ -116,31 +119,28 @@ class ShapeMixin(object):
 	# Need to redefine color/alpha due to slightly different API (color -> fill_color)
 	def _set_alpha(self, value):
 		value = min(1, max(0, value))
-		color = self.sprite.fill_color
+		color = self.drawable.fill_color
 		color.a = value*255
-		self.sprite.fill_color = color
-	alpha = property(lambda self: self.sprite.fill_color.a/255, _set_alpha)
+		self.drawable.fill_color = color
+	alpha = property(lambda self: self.drawable.fill_color.a/255, _set_alpha)
 
 	def _set_color(self, value):
 		color = self.hex2color(value)
-		color.a = self.sprite.fill_color.a
-		self.sprite.fill_color = color
-	color = property(lambda self: self.color2hex(self.sprite.fill_color), _set_color)
+		color.a = self.drawable.fill_color.a
+		self.drawable.fill_color = color
+	color = property(lambda self: self.color2hex(self.drawable.fill_color), _set_color)
 
 
 class RectangleShape(ShapeMixin, Image):
 	def __init__(self, width, height, color=0xFFFFFF, alpha=1):
-		super().__init__(None)
-		# I know, it's not a sprite. Whatever.
-		self.sprite = sfml.RectangleShape((width, height))
+		super().__init__(sfml.RectangleShape((width, height)))
 		self.color = color
 		self.alpha = alpha
 
 
 class CircleShape(ShapeMixin, Image):
 	def __init__(self, radius, color=0xFFFFFF, alpha=1):
-		super().__init__(None)
-		self.sprite = sfml.CircleShape(radius)
+		super().__init__(sfml.CircleShape(radius))
 		self.color = color
 		self.alpha = alpha
 
@@ -162,7 +162,7 @@ class Spritemap(Image):
 		# Init
 		self._rect = Rectangle(0, 0, frame_width, frame_height)
 		super().__init__(source, self._rect)
-		source = self.sprite.texture
+		source = self.drawable.texture
 		if not frame_width:
 			_rect.width = source.width
 		if not frame_height:
@@ -178,7 +178,7 @@ class Spritemap(Image):
 	def render(self, target, point, camera):
 		self._rect.x = self._rect.width * (self._frame % self._columns)
 		self._rect.y = self._rect.height * int(self._frame / self._columns)
-		self.sprite.set_texture_rect(self._rect)
+		self.drawable.set_texture_rect(self._rect)
 
 		super().render(target, point, camera)
 
@@ -298,11 +298,11 @@ def get_image(loc, cache):
 		loc = loc.encode()
 	if loc in image_cache:
 		return image_cache[loc]
-	else:
-		image = sfml.Image.load_from_file(loc)
-		pixels = image.get_pixels()
-		texture = sfml.Texture.load_from_image(image)
-		t = (texture, pixels)
-		if cache:
-			image_cache[loc] = t
-		return t
+	
+	image = sfml.Image.load_from_file(loc)
+	pixels = image.get_pixels()
+	texture = sfml.Texture.load_from_image(image)
+	t = (texture, pixels)
+	if cache:
+		image_cache[loc] = t
+	return t
