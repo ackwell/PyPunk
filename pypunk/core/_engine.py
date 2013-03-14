@@ -1,4 +1,5 @@
 import sfml
+from ._graphics import Graphic
 from ._pp import PP
 from ._world import World
 from ..geom import Rectangle
@@ -105,8 +106,8 @@ class Screen(sfml.RenderWindow):
 		self._color = sfml.Color(32, 32, 32)
 
 	def _set_color(self, value):
-		self._color = graphics.hex2color(value)
-	color = property(lambda self: graphics.color2hex(self._color), _set_color)
+		self._color = Graphic.hex2color(value)
+	color = property(lambda self: Graphic.color2hex(self._color), _set_color)
 
 	mouse_x = property(lambda _:Input.mouse_x)
 	mouse_y = property(lambda _:Input.mouse_y)

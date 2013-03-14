@@ -21,10 +21,12 @@ class Graphic(object):
 	def render(self, target, point, camera): pass
 
 	# Utility functions
-	def hex2color(self, _hex):
+	@staticmethod
+	def hex2color(_hex):
 		b = _hex & 255
 		g = (_hex >> 8) & 255 
 		r = (_hex >> 16) & 255
 		return sfml.Color(r, g, b)
-	def color2hex(self, color):
+	@staticmethod
+	def color2hex(color):
 		return color.r*65536 + color.g*256 + color.b
