@@ -1,9 +1,9 @@
 import math
 import random
 import sfml
-from ._base import Graphic
-from ..geom import Point, Rectangle
 from ..core._pp import PP
+from ..core._graphics import Graphic
+from ..geom import Point, Rectangle
 
 
 class Image(Graphic):
