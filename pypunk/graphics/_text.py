@@ -2,7 +2,6 @@ import os
 import sfml
 from ._bitmap import Image
 from ..core import PyPunkError
-print()
 
 # Note: SFML Text objects are a lot more limited than that found in flash.
 # I'll likely try to expand this somewhat at a later point, but for now, it

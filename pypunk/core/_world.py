@@ -82,7 +82,7 @@ class World(Tweener):
 	def add_graphic(self, graphic, layer=0, x=0, y=0):
 		e = Entity(x, y, graphic)
 		if layer != 0:
-			e.layer = 0
+			e.layer = layer
 		e.active = False
 		return self.add(e)
 
