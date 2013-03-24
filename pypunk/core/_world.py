@@ -18,9 +18,21 @@ class World(Tweener):
 		self._add = []
 		self._remove = []
 		# Layers/types
-		self._layers = {}
-		self._types = {}
+		# self._layers = {}
+		# self._types = {}
 		self._entity_names = {}
+		# Update info
+		self._update_first = None
+		# Render info
+		self._render_first = []
+		self._render_last = []
+		self._layer_list = []
+		# self._layer_count = []
+		# self._layer_sort = False
+		# self._class_count = {}
+		# self._type_first = {}
+		# self._type_count = {}
+
 
 	# Called when the world is switched to
 	def begin(self): pass
@@ -30,24 +42,30 @@ class World(Tweener):
 
 	# Called by Engine game loop. Updates contained entities.
 	def update(self):
-		for e in self._iter_entities():
+		e = self._update_first
+		while e:
 			if e.active:
 				if e._tween:
 					e.update_tweens()
 				e.update()
 			if e._graphic and e._graphic.active:
 				e._graphic.update()
+			e = e._update_next
 
 	# Called by Engine game loop. Renders contained entities
 	def render(self):
-		for e in self._iter_entities():
-			if e.visible:
-				e.render()
+		for i in reversed(self._layer_list)
+			i -= 1
+			e = self._render_last[i]
+			while e:
+				if e.visible:
+					e.render()
+				e = e._render_prev
 
-	def _iter_entities(self):
-		for layer in sorted(self._layers.keys(), reverse=True):
-			for e in self._layers[layer]:
-				yield e
+	# def _iter_entities(self):
+	# 	for layer in sorted(self._layers.keys(), reverse=True):
+	# 		for e in self._layers[layer]:
+	# 			yield e
 
 	mouse_x = property(lambda self:PP.screen.mouse_x+self.camera.x)
 	mouse_y = property(lambda self:PP.screen.mouse_y+self.camera.y)
@@ -61,7 +79,10 @@ class World(Tweener):
 		return e
 
 	def remove_all(self):
-		pass #TODO
+		e = self._update_first
+		while e:
+			self._remove.append(e)
+			e = e._update_next
 
 	def add_list(self, *entities):
 		if entities[0] is list:
@@ -89,48 +110,56 @@ class World(Tweener):
 	# ADD_MASK
 
 	def bring_to_front(self, e):
-		if self.is_at_front(e):
+		if e._world != self or not e._render_prev:
 			return False
-		layer = self._layers[e.layer]
-		layer.remove(e)
-		layer.append(e)
+		# Pull from list
+		e._render_prev._render_next  = e._render_next
+		if e._render_next:
+			e._render_next._render_prev = e._render_prev
+		else:
+			self._render_last[e._layer] = e._render_prev
+		# Place at start
+		e._render_next = self._render_first[e._layer]
+		e._render_next._render_prev = e
+		self._render_first[e._layer] = e
+		e._render_prev = None
 
-	def send_to_back(self, e):
-		if self.is_at_back(e):
-			return False
-		layer = self._layers[e.layer]
-		layer.remove(e)
-		layer.insert(0, e)
+	# def send_to_back(self, e):
+	# 	if self.is_at_back(e):
+	# 		return False
+	# 	layer = self._layers[e.layer]
+	# 	layer.remove(e)
+	# 	layer.insert(0, e)
 
-	def bring_forward(self, e):
-		if self.is_at_front(e):
-			return False
-		layer = self._layers[e.layer]
-		i = layer.index(e)
-		layer.remove(e)
-		layer.insert(i+1, e)
+	# def bring_forward(self, e):
+	# 	if self.is_at_front(e):
+	# 		return False
+	# 	layer = self._layers[e.layer]
+	# 	i = layer.index(e)
+	# 	layer.remove(e)
+	# 	layer.insert(i+1, e)
 
-	def send_backward(self, e):
-		if self.is_at_back(e):
-			return False
-		layer = self._layers[e.layer]
-		i = layer.index(e)
-		layer.remove(e)
-		layer.insert(i-1, e)
+	# def send_backward(self, e):
+	# 	if self.is_at_back(e):
+	# 		return False
+	# 	layer = self._layers[e.layer]
+	# 	i = layer.index(e)
+	# 	layer.remove(e)
+	# 	layer.insert(i-1, e)
 
-	def is_at_front(self, e):
-		if e._world != self:
-			return False
-		if self._layers[e.layer].index(e) == len(self._layers[e.layer])-1:
-			return True
-		return False
+	# def is_at_front(self, e):
+	# 	if e._world != self:
+	# 		return False
+	# 	if self._layers[e.layer].index(e) == len(self._layers[e.layer])-1:
+	# 		return True
+	# 	return False
 
-	def is_at_back(self, e):
-		if e._world != self:
-			return False
-		if self._layers[e.layer].index(e) == 0:
-			return True
-		return False
+	# def is_at_back(self, e):
+	# 	if e._world != self:
+	# 		return False
+	# 	if self._layers[e.layer].index(e) == 0:
+	# 		return True
+	# 	return False
 
 	# COLLIDE FUNCTIONS
 
