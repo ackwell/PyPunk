@@ -24,11 +24,11 @@ class World(Tweener):
 		# Update info
 		self._update_first = None
 		# Render info
-		self._render_first = []
-		self._render_last = []
+		self._render_first = {}
+		self._render_last = {}
 		self._layer_list = []
 		# self._layer_count = []
-		# self._layer_sort = False
+		self._layer_sort = False
 		# self._class_count = {}
 		# self._type_first = {}
 		# self._type_count = {}
@@ -54,8 +54,7 @@ class World(Tweener):
 
 	# Called by Engine game loop. Renders contained entities
 	def render(self):
-		for i in reversed(self._layer_list):
-			i -= 1
+		for i in self._layer_list:
 			e = self._render_last[i]
 			while e:
 				if e.visible:
@@ -184,29 +183,45 @@ class World(Tweener):
 	# ENTITY FINDING FUNCTIONS
 
 	def _update_lists(self):
-		# Remove entities
 		for e in self._remove:
+			if not e._world:
+				if e in self._add:
+					self._add.remove(e)
+				continue
+			if e._world != self:
+				continue
 			e.removed()
 			e._world = None
-			self._remove_layer(e)
-			if e._type != '':
+			self._remove_update(e)
+			self._remove_render(e)
+			if e._type:
 				self._remove_type(e)
-			if e._name != '':
+			if e._name:
 				self._unregister_name(e)
+			if e.auto_clear and e._tween:
+				e.clear_tweens()
 		self._remove = []
 
-		# Add entities
 		for e in self._add:
-			# Add to the update/render whatsit
-			self._add_layer(e)
-			# If it has a type, add it to the typelist, likewise for name
-			if e._type != '':
+			if e._world:
+				continue
+			self._add_update(e)
+			self._add_render(e)
+			if e._type:
 				self._add_type(e)
-			if e._name != '':
+			if e._name:
 				self._register_name(e)
 			e._world = self
 			e.added()
 		self._add = []
+
+		# Recycle entities here if ever I implement that
+
+		# Sort layer list
+		if self._layer_sort:
+			if len(_layer_list) > 1:
+				self._layer_list.sort()
+			self._layer_sort = False
 
 	def _add_layer(self, e):
 		if e.layer not in self._layers:
