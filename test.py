@@ -8,8 +8,6 @@ from pypunk.tweens.misc import ColorTween
 class GameWorld(World):
 	def __init__(self):
 		super().__init__()
-		self.game_entity = GameEntity()
-		self.add(self.game_entity)
 
 		self.add_graphic(Image('EntityImage2.png'), 0, 50, 50)
 
@@ -24,7 +22,10 @@ class GameWorld(World):
 		text = Text('Hello', 100, 100, size=48)
 
 		gl = Graphiclist(self.test, text)
-		self.add_graphic(gl)
+		self.add_graphic(gl, 1)
+
+		self.game_entity = GameEntity()
+		self.add(self.game_entity)
 
 	def update(self):
 		super().update()

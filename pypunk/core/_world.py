@@ -54,7 +54,7 @@ class World(Tweener):
 
 	# Called by Engine game loop. Renders contained entities
 	def render(self):
-		for i in reversed(self._layer_list)
+		for i in reversed(self._layer_list):
 			i -= 1
 			e = self._render_last[i]
 			while e:
@@ -123,43 +123,61 @@ class World(Tweener):
 		e._render_next._render_prev = e
 		self._render_first[e._layer] = e
 		e._render_prev = None
+		return True
 
-	# def send_to_back(self, e):
-	# 	if self.is_at_back(e):
-	# 		return False
-	# 	layer = self._layers[e.layer]
-	# 	layer.remove(e)
-	# 	layer.insert(0, e)
+	def send_to_back(self, e):
+		if e._world != self or not e._render_next:
+			return False
+		e._render_next._render_prev = e._render_prev
+		if e._render_prev:
+			e._render_prev._render_next = e._render_next
+		else:
+			self._render_first[e._layer] = e._render_next
+		e._render_prev = self._render_last[e._layer]
+		e._render_prev._render_next = e
+		self._render_last[e._layer] = e
+		e._render_next = None
+		return True
 
-	# def bring_forward(self, e):
-	# 	if self.is_at_front(e):
-	# 		return False
-	# 	layer = self._layers[e.layer]
-	# 	i = layer.index(e)
-	# 	layer.remove(e)
-	# 	layer.insert(i+1, e)
+	def bring_forward(self, e):
+		if e._world != self or not e._render_prev:
+			return False
+		e._render_prev._render_next = e._render_next
+		if e._render_next:
+			e._render_next._render_prev = e._render_prev
+		else:
+			self._render_last[e._layer] = e._render_prev
+		e._render_next = e._render_prev
+		e._render_prev = e._render_prev._render_prev
+		e._render_next._render_prev = e
+		if e._render_prev:
+			e._render_prev._render_next = e
+		else:
+			self._render_first[e._layer] = e
+		return True
 
-	# def send_backward(self, e):
-	# 	if self.is_at_back(e):
-	# 		return False
-	# 	layer = self._layers[e.layer]
-	# 	i = layer.index(e)
-	# 	layer.remove(e)
-	# 	layer.insert(i-1, e)
+	def send_backwards(self, e):
+		if e._world != self or not e._render_next:
+			return False
+		e._render_next._render_prev = e._render_prev
+		if e._render_prev:
+			e._render_prev._render_next = e._render_next
+		else:
+			self._render_first[e._layer] = e._render_next
+			e._render_prev = e._render_next
+			e._render_next = e._render_next._render_next
+			e._render_prev._render_next = e
+			if e._render_next:
+				e._render_next._render_prev = e
+			else:
+				self._render_last[e._layer] = e
+			return True
 
-	# def is_at_front(self, e):
-	# 	if e._world != self:
-	# 		return False
-	# 	if self._layers[e.layer].index(e) == len(self._layers[e.layer])-1:
-	# 		return True
-	# 	return False
+	def is_at_front(self, e):
+		return e._render_prev == None
 
-	# def is_at_back(self, e):
-	# 	if e._world != self:
-	# 		return False
-	# 	if self._layers[e.layer].index(e) == 0:
-	# 		return True
-	# 	return False
+	def is_at_back(self, e):
+		return e._render_next == None
 
 	# COLLIDE FUNCTIONS
 
