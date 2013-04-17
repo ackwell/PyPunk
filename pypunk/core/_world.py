@@ -23,15 +23,16 @@ class World(Tweener):
 		self._entity_names = {}
 		# Update info
 		self._update_first = None
+		self._count = 0
 		# Render info
 		self._render_first = {}
 		self._render_last = {}
 		self._layer_list = []
-		# self._layer_count = []
+		self._layer_count = {}
 		self._layer_sort = False
-		# self._class_count = {}
-		# self._type_first = {}
-		# self._type_count = {}
+		self._class_count = {}
+		self._type_first = {}
+		self._type_count = {}
 
 
 	# Called when the world is switched to
@@ -60,11 +61,6 @@ class World(Tweener):
 				if e.visible:
 					e.render()
 				e = e._render_prev
-
-	# def _iter_entities(self):
-	# 	for layer in sorted(self._layers.keys(), reverse=True):
-	# 		for e in self._layers[layer]:
-	# 			yield e
 
 	mouse_x = property(lambda self:PP.screen.mouse_x+self.camera.x)
 	mouse_y = property(lambda self:PP.screen.mouse_y+self.camera.y)
@@ -219,31 +215,113 @@ class World(Tweener):
 
 		# Sort layer list
 		if self._layer_sort:
-			if len(_layer_list) > 1:
+			if len(self._layer_list) > 1:
 				self._layer_list.sort()
 			self._layer_sort = False
 
-	def _add_layer(self, e):
-		if e.layer not in self._layers:
-			self._layers[e.layer] = []
-		self._layers[e.layer].append(e) 
+	def _add_update(self, e):
+		if self._update_first:
+			self._update_first._update_prev = e
+			e._update_next = self._update_first
+		else:
+			e._update_next = None
+		e._update_prev = None
+		self._update_first = e
+		self._count += 1
+		if e._class not in self._class_count:
+			self._class_count[e._class] = 0
+		self._class_count[e._class] += 1
+
+	def _remove_update(self, e):
+		if self._update_first == e:
+			self._update_first = e._update_next
+		if e._update_next:
+			e._update_next._update_prev = e._update_prev
+		if e._update_prev:
+			e._update_prev._update_next = e._update_next
+		e._update_next = e._update_prev = None
+		self._count -= 1
+		self._class_count[e._class] -= 1
+
+	def _add_render(self, e):
+		if e._layer in self._render_first:
+			f = self._render_first[e._layer]
+			e._render_next = f
+			f._render_prev = e
+			self._layer_count[e._layer] += 1
+		else:
+			self._render_last[e._layer] = e
+			self._layer_list.append(e._layer)
+			self._layer_sort = True
+			e._render_next = None
+			self._layer_count[e._layer] = 1
+		self._render_first[e._layer] = e
+		e._render_prev = None
+
+	def _remove_render(self, e):
+		if e._render_next:
+			e._render_next._render_prev = e._render_prev
+		else:
+			self._render_last[e._layer] = e._render_prev
+		if e._render_prev:
+			e._render_prev._render_next = e._render_next
+		else:
+			self._render_first[e._layer] = e._render_next
+			if not e._render_next:
+				self._layer_list.remove(e._layer)
+				self._layer_sort = True
+		self._layer_count[e._layer] -= 1
+		e._render_next = e._render_prev = None
 
 	def _add_type(self, e):
-		if e.type not in self._types:
-			self._types[e.type] = []
-		self._types[e.type].append(e)
+		if e._type in self._type_first:
+			self._type_first[e._type]._type_prev = e
+			e._type_next = self._type_first[e._type]
+			self._type_count[e._type] += 1
+		else:
+			e._type_next = None
+			self._type_count[e._type] = 1
+		e._type_prev = None
+		self._type_first[e._type] = e
+
+	def _remove_type(self, e):
+		if self._type_first[e._type] == e:
+			self._type_first[e._type] = e._type_next
+		if e._type_next:
+			e._type_next._type_prev = e._type_prev
+		if e._type_prev:
+			e._type_prev._type_next = e._type_next
+		e._type_next = e._type_prev = None
+		self._type_count[e._type] -= 1
 
 	def _register_name(self, e):
 		self._entity_names[e._name] = e
 
-	def _remove_layer(self, e):
-		# Possibly need to catch error? (according to old code)
-		self._layers[e.layer].remove(e)
-
-	def _remove_type(self, e):
-		if e.type:
-			self._types[e.type].remove(e)
-
 	def _unregister_name(self, e):
-		if e._name in self._entity_names and self._entity_names[e._name] == e:
+		if self._entity_names[e._name] == e:
 			del self._entity_names[e._name]
+
+	# def _add_layer(self, e):
+	# 	if e.layer not in self._layers:
+	# 		self._layers[e.layer] = []
+	# 	self._layers[e.layer].append(e) 
+
+	# def _add_type(self, e):
+	# 	if e.type not in self._types:
+	# 		self._types[e.type] = []
+	# 	self._types[e.type].append(e)
+
+	# def _register_name(self, e):
+	# 	self._entity_names[e._name] = e
+
+	# def _remove_layer(self, e):
+	# 	# Possibly need to catch error? (according to old code)
+	# 	self._layers[e.layer].remove(e)
+
+	# def _remove_type(self, e):
+	# 	if e.type:
+	# 		self._types[e.type].remove(e)
+
+	# def _unregister_name(self, e):
+	# 	if e._name in self._entity_names and self._entity_names[e._name] == e:
+	# 		del self._entity_names[e._name]
