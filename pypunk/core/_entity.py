@@ -22,7 +22,12 @@ class Entity(Tweener):
 		self._type = ''
 		self._name = ''
 		self._layer = 0
-		# hitbox?
+		self._update_prev = None
+		self._update_next = None
+		self._render_prev = None
+		self._render_next = None
+		self._type_prev = None
+		self._type_next = None
 		self._mask = None
 		self._graphic = None
 		self._point = PP.point
