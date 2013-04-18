@@ -18,8 +18,6 @@ class World(Tweener):
 		self._add = []
 		self._remove = []
 		# Layers/types
-		# self._layers = {}
-		# self._types = {}
 		self._entity_names = {}
 		# Update info
 		self._update_first = None
@@ -176,7 +174,101 @@ class World(Tweener):
 
 	# COLLIDE FUNCTIONS
 
-	# ENTITY FINDING FUNCTIONS
+	count = property(lambda self: self._count)
+
+	def type_count(self, t):
+		return self._type_count[t]
+
+	def class_count(self, c):
+		return self._class_count[c]
+
+	def layer_count(self, l):
+		return self._layer_count[l]
+
+	first = property(lambda self: self._update_first)
+
+	layers = property(lambda self: len(self._layer_list))
+
+	def type_first(self, t):
+		if not self._update_first:
+			return None
+		return self._type_first[t]
+
+	def class_first(self, c):
+		if not self._update_first:
+			return None
+		e = self._update_first
+		while e:
+			if isinstance(e, c):
+				return e
+			e = e._update_next
+		return None
+
+	def layer_first(self, l):
+		if not self._update_first:
+			return None
+		return self._render_first[l]
+
+	def layer_last(self, l):
+		if not self._update_first:
+			return None
+		return self._render_last[l]
+
+	def _get_farthest(self):
+		if not self._update_first:
+			return None
+		return self._render_last[self._layer_list[-1]]
+	farthest = property(_get_farthest)
+
+	def _get_nearest(self):
+		if not self._update_first:
+			return None
+		return self._render_last[self._layer_list[0]]
+	nearest = property(_get_nearest)
+
+	def _get_layer_farthest(self):
+		if not self._update_first:
+			return None
+		return self._layer_list[-1]
+	layer_farthest = property(_get_layer_farthest)
+
+	def _get_layer_nearest(self):
+		if not self._update_first:
+			return None
+		return self._layer_list[0]
+	layer_nearest = property(_get_layer_nearest)
+
+	def _get_unique_types(self):
+		return len(self._type_count)
+	unique_types = property(_get_unique_types)
+
+	def get_type(self, t, into):
+		e = self._type_first[t]
+		while e:
+			into.append(e)
+			e = e._type_next
+
+	def get_class(self, c, into):
+		e = self._update_first
+		while e:
+			if isinstance(e, c):
+				into.append(e)
+			e = e._update_next
+
+	def get_layer(self, l, into):
+		e = self._render_last[l]
+		while e:
+			into.append(e)
+			e = e._render_prev
+
+	def get_all(self, into):
+		e = self._update_first
+		while e:
+			into.append(e)
+			e = e._update_next
+
+	def get_instance(self, name):
+		return self._entity_names[name]
 
 	def _update_lists(self):
 		for e in self._remove:
