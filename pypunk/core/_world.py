@@ -300,28 +300,3 @@ class World(Tweener):
 	def _unregister_name(self, e):
 		if self._entity_names[e._name] == e:
 			del self._entity_names[e._name]
-
-	# def _add_layer(self, e):
-	# 	if e.layer not in self._layers:
-	# 		self._layers[e.layer] = []
-	# 	self._layers[e.layer].append(e) 
-
-	# def _add_type(self, e):
-	# 	if e.type not in self._types:
-	# 		self._types[e.type] = []
-	# 	self._types[e.type].append(e)
-
-	# def _register_name(self, e):
-	# 	self._entity_names[e._name] = e
-
-	# def _remove_layer(self, e):
-	# 	# Possibly need to catch error? (according to old code)
-	# 	self._layers[e.layer].remove(e)
-
-	# def _remove_type(self, e):
-	# 	if e.type:
-	# 		self._types[e.type].remove(e)
-
-	# def _unregister_name(self, e):
-	# 	if e._name in self._entity_names and self._entity_names[e._name] == e:
-	# 		del self._entity_names[e._name]
