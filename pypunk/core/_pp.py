@@ -7,6 +7,8 @@ from ..utils import Singleton
 class _pp(Singleton):
 	"Static class to access global properties and functions"
 	def __init__(cls):
+		cls.VERSION = '2.DEV'
+
 		# Init variables as a safeguard
 		cls.width = 0
 		cls.height = 0
