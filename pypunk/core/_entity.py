@@ -91,7 +91,7 @@ class Entity(Tweener):
 		self._type = value
 		if self._type:
 			self._world._add_type(self)
-	# Bad code, i know. SOWEEEE (using 'type' as a variable)
+	# Not supposed to use type as a variable, I know. Deal with it.
 	type = property(lambda self:self._type, _set_type)
 
 	def _set_graphic(self, g):
@@ -105,7 +105,29 @@ class Entity(Tweener):
 	def add_graphic(g):
 		raise NotImplementedError()
 
-	# SET HITBOX, ETC
+	def set_hitbox(self, width=0, height=0, origin_x=0, origin_y = 0):
+		self.width = width
+		self.height = height
+		self.origin_x = origin_x
+		self.origin_y = origin_y
+
+	def set_hitbox_to(self, o):
+		if hasattr(o, 'width'):
+			self.width = o.width
+		if hasattr(o, 'height'):
+			self.height = o.height
+		if hasattr(o, 'origin_x'):
+			self.origin_x = o.origin_x
+		elif hasattr(o, 'x'):
+			self.origin_x = -o.x
+		if hasattr(o, 'origin_y'):
+			self.origin_y = o.origin_y
+		elif hasattr(o, 'y'):
+			self.origin_y = -o.y
+
+	def set_origin(self, x=0, y=0):
+		self.origin_x = x
+		self.origin_y = y
 
 	def center_origin(self):
 		self.origin_x = width/2
