@@ -69,6 +69,26 @@ class GameEntity(Entity):
 			self.y += 50 * PP.elapsed
 
 
+class Button(Entity):
+	def __init__(self, x=0, y=0):
+		super().__init__()
+		self._map = None
+
+	def update(self):
+		if not self.world:
+			return
+
+		# COLLIDE STUFF
+
+	def set_spritemap(self, asset, frame_w, frame_h):
+		self._map = Spritemap(asset, frame_w, frame_h)
+		self._map.add('up', [0])
+		self._map.add('over', [1])
+		self._map.add('down', [2])
+		self.graphic = self._map
+		self.set_hitbox(frame_w, frame_h)
+
+
 if __name__ == '__main__':
 	# Create an instance of the Engine, add a world, start it up
 	engine = Engine(640, 480, 60, 'PyPunk Test')

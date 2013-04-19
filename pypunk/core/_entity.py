@@ -28,7 +28,12 @@ class Entity(Tweener):
 		self._render_next = None
 		self._type_prev = None
 		self._type_next = None
+		self.HITBOX = None
 		self._mask = None
+		self._x = 0
+		self._y = 0
+		self._move_x = 0
+		self._move_y = 0
 		self._graphic = None
 		self._point = PP.point
 		self._camera = PP.point2
@@ -56,7 +61,57 @@ class Entity(Tweener):
 			self._camera.y = self._world.camera.y if self._world else PP.camera.y
 			self._graphic.render(self.render_target if self.render_target else PP.screen, self._point, self._camera)
 
-	# COLLISION FUNCTIONS
+	def collide(self, t, x, y):
+		if not self._world:
+			return None
+
+		e = self._world._type_first[t]
+		if not e:
+			return None
+
+		while e:
+			if self.collide_with(e, x, y):
+				return e
+			e = e._type_next
+		return None
+
+	def collide_types(self, types, x, y):
+		if not self._world:
+			return None
+
+		if isinstance(types, str):
+			return self.collide(types, x, y)
+		else:
+			for t in types:
+				e = collide(t, x, y)
+				if e:
+					return e
+
+		return None
+
+	def collide_with(self, e, x, y):
+	# Not altogether sure why this is needed, keeping in in case magic
+		self._x, self._y = self.x, self.y
+		self.x, self.y = x, y
+
+		if e.collidable and e != self \
+		and x - self.origin_x + self.width > e.x - e.origin_x \
+		and y - self.origin_y + self.height > e.y - e.origin_y \
+		and x - self.origin_x < e.x - e.origin_x + e.width \
+		and y - self.origin_y < e.y - self.origin_y + e.height:
+			if not self._mask:
+				if not e._mask or e._mask.collide(self.HITBOX):
+					self.x, self.y = self._x, self._y
+					return e
+				self.x, self.y = self._x, self._y
+				return None
+			if self._mask.collide(e._mask if e._mask else e.HITBOX):
+				self.x, self.y = self._x, self._y
+				return e
+		self.x, self.y = self._x, self._y
+		return None
+
+	# def collide_rect()
 
 	# onCamera
 
