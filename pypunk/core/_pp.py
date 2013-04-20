@@ -1,7 +1,5 @@
 import math
 import random
-from ..debug import Console
-from ..geom import Point, Rectangle
 from ..utils import Singleton
 
 class _pp(Singleton):
@@ -30,11 +28,48 @@ class _pp(Singleton):
 		cls.DEG = -180 / math.pi
 		cls.RAD = math.pi / -180
 
-		# Global objects for rendering/collision/etc
-		cls.point = Point()
-		cls.point2 = Point()
-		cls.zero = Point()
-		cls.rect = Rectangle()
+		cls._point = None
+		cls._point2 = None
+		cls._zero = None
+		cls._rect = None
+		cls._entity = None
+
+	# Global objects for rendering/collision/etc
+	# Only created when first requested to prevent circular imports
+	def _get_point(cls):
+		if not cls._point:
+			from ..geom import Point
+			cls._point = Point()
+		return cls._point
+	point = property(_get_point)
+
+	def _get_point2(cls):
+		if not cls._point2:
+			from ..geom import Point
+			cls._point2 = Point()
+		return cls._point2
+	point2 = property(_get_point2)
+
+	def _get_zero(cls):
+		if not cls._zero:
+			from ..geom import Point
+			cls._zero = Point()
+		return cls._zero
+	zero = property(_get_zero)
+
+	def _get_rect(cls):
+		if not cls._rect:
+			from ..geom import Rectangle
+			cls._rect = Rectangle()
+		return cls._rect
+	rect = property(_get_rect)
+
+	def _get_entity(cls):
+		if not cls._entity:
+			from ._entity import Entity
+			cls._entity = Entity()
+		return cls._entity
+	entity = property(_get_entity)
 
 	def _set_world(cls, world):
 		if cls._world == world:
@@ -48,6 +83,7 @@ class _pp(Singleton):
 
 	def _get_console(cls):
 		if not cls._console:
+			from ..debug import Console
 			cls._console = Console()
 		return cls._console
 	console = property(_get_console)
