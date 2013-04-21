@@ -115,7 +115,7 @@ class Image(Graphic):
 	clip_rect = property(_get_clip_rect)
 
 
-class ShapeMixin(object):
+class Shape(Image):
 	# Need to redefine color/alpha due to slightly different API (color -> fill_color)
 	def _set_alpha(self, value):
 		value = min(1, max(0, value))
@@ -131,14 +131,14 @@ class ShapeMixin(object):
 	color = property(lambda self: self.color2hex(self.drawable.fill_color), _set_color)
 
 
-class RectangleShape(ShapeMixin, Image):
+class RectangleShape(Shape):
 	def __init__(self, width, height, color=0xFFFFFF, alpha=1):
 		super().__init__(sfml.RectangleShape((width, height)))
 		self.color = color
 		self.alpha = alpha
 
 
-class CircleShape(ShapeMixin, Image):
+class CircleShape(Shape):
 	def __init__(self, radius, color=0xFFFFFF, alpha=1):
 		super().__init__(sfml.CircleShape(radius))
 		self.color = color

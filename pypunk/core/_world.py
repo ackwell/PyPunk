@@ -3,8 +3,6 @@ from ._tweening import Tweener
 from ._pp import PP
 from ..geom import Point
 
-# Might be worth using original next/prev based update and render order... dunno
-
 class World(Tweener):
 	def __init__(self):
 		super().__init__()
@@ -366,7 +364,7 @@ class World(Tweener):
 		e._render_next = e._render_prev = None
 
 	def _add_type(self, e):
-		if e._type in self._type_first:
+		if e._type in self._type_first and self._type_first[e._type] is not None:
 			self._type_first[e._type]._type_prev = e
 			e._type_next = self._type_first[e._type]
 			self._type_count[e._type] += 1
