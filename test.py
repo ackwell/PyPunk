@@ -1,3 +1,4 @@
+from random import random
 from pypunk.core import PP, Engine, World, Entity, Tween
 from pypunk.graphics import Image, Spritemap, Text, Graphiclist
 from pypunk.utils import Input, Key, Ease
@@ -23,9 +24,16 @@ class GameWorld(World):
 
 		gl = Graphiclist(self.test, text)
 		self.add_graphic(gl, 1)
-
+   
 		self.game_entity = GameEntity()
 		self.add(self.game_entity)
+
+		self._button = Button(400, 200, self.on_button_click)
+		self._button.set_spritemap('ButtonSheet.png', 50, 40)
+		self.add(self._button)
+
+	def on_button_click(self):
+		PP.screen.color = int(random() * 0xFFFFFF)
 
 	def update(self):
 		super().update()
@@ -70,15 +78,26 @@ class GameEntity(Entity):
 
 
 class Button(Entity):
-	def __init__(self, x=0, y=0):
-		super().__init__()
+	def __init__(self, x=0, y=0, callback=None, *args, **kwargs):
+		super().__init__(x, y)
 		self._map = None
+		self._callback = callback
+		self._args = args
+		self._kwargs = kwargs
 
 	def update(self):
 		if not self.world:
 			return
 
-		# COLLIDE STUFF
+		if self.collide_point(self.x - self.world.camera.x, self.y - self.world.camera.y, Input.mouse_x, Input.mouse_y):
+			if Input.mouse_released() and self._callback:
+				self._callback(*self._args, **self._kwargs)
+			elif Input.mouse_down():
+				self._map.play('down')
+			else:
+				self._map.play('over')
+		else:
+			self._map.play('up')
 
 	def set_spritemap(self, asset, frame_w, frame_h):
 		self._map = Spritemap(asset, frame_w, frame_h)

@@ -111,7 +111,43 @@ class Entity(Tweener):
 		self.x, self.y = self._x, self._y
 		return None
 
-	# def collide_rect()
+	def collide_rect(self, x, y, r_x, r_y, r_width, r_height):
+		if x - self.origin_x + self.width >= r_x and y - self.origin_y >= r_y \
+		and x - self.origin_x <= r_x + r_width and y - self.origin_y <= r_y + r_height:
+			if not self._mask:
+				return True
+			self._x, self._y = self.x, self.y
+			self.x, self.y = x, y
+			PP.entity.x = r_x
+			PP.entity.y = r_y
+			PP.entity.width = r_width
+			PP.entity.height = r_height
+			if (self._mask.collide(PP.entity.HITBOX)):
+				self.x, self.y = self._x, self._y
+				return True
+			self.x, self.y = self._x, self._y
+		return False
+
+	def collide_point(self, x, y, p_x, p_y):
+		if p_x >= x - self.origin_x and p_y >= y - self.origin_y \
+		and p_x < x - self.origin_x + self.width and p_y < y - self.origin_y + self.height:
+			if not self._mask:
+				return True
+			self._x, self._y = self.x, self.y
+			self.x, self.y = x, y
+			PP.entity.x = p_x
+			PP.entity.y = p_y
+			PP.entity.width = 1
+			PP.entity.height = 1
+			if (self._mask.collide(PP.entity.HITBOX)):
+				self.x, self.y = self._x, self._y
+				return True
+			self.x, self.y = self._x, self._y
+		return False
+
+	# collide_into
+
+	# collide_types_into
 
 	# onCamera
 
@@ -188,12 +224,36 @@ class Entity(Tweener):
 		self.origin_x = width/2
 		self.origin_y = height/2
 
-	# DISTANCE FUNCTIONS
+	# distance_from
+
+	# distance_to_point
+
+	# distance_to_rect
 
 	def __str__(self):
 		return self._class
 
-	# MOVE FUNCTIONS
+	# move_by
+
+	# move_to
+
+	# move_towards
+
+	# move_collide_x
+
+	# move_collide_y
+
+	def clamp_horizontal(self, left, right, padding=0):
+		if self.x - self.origin_x < left + padding:
+			self.x = left + self.origin_x + padding
+		if self.x - self.origin_x + self.width > right - padding:
+			self.x = right - self.width + self.origin_x - padding
+
+	def clamp_vertical(self, top, bottom, padding=0):
+		if self.y - self.origin_y < top + padding:
+			self.y = top + self.origin_y + padding
+		if self.y - self.origin_y + self.height > bottom - padding:
+			self.y = bottom - self.height + self.origin_x - padding
 
 	def _set_name(self, value):
 		if self._name == value:
