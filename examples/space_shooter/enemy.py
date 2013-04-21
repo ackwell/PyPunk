@@ -23,5 +23,11 @@ class Alien(Entity):
 		if self.x < -40:
 			self.destroy()
 
+		bullet = self.collide('bullet', self.x, self.y)
+		if bullet:
+			self.world.hud.score += 1
+			bullet.destroy()
+			self.destroy()
+
 	def destroy(self):
 		self.world.remove(self)

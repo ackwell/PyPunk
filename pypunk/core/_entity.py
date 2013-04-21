@@ -65,9 +65,9 @@ class Entity(Tweener):
 		if not self._world:
 			return None
 
-		e = self._world._type_first[t]
-		if not e:
+		if t not in self._world._type_first:
 			return None
+		e = self._world._type_first[t]
 
 		while e:
 			if self.collide_with(e, x, y):

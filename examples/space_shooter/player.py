@@ -20,6 +20,7 @@ class Ship(Entity):
 		self.move()
 		self.constrain()
 		self.shoot()
+		self.collision()
 
 	def move(self):
 		if Input.check(Key.RIGHT):
@@ -29,7 +30,7 @@ class Ship(Entity):
 		if Input.check(Key.DOWN):
 			self.y += self.speed * PP.elapsed
 		if Input.check(Key.UP):
-			self.y -= self.speed * PP.elapsed
+			self.y -= self.speed * PP.elapsed 
 
 	def constrain(self):
 		# print(self.height, self.width)
@@ -39,6 +40,13 @@ class Ship(Entity):
 	def shoot(self):
 		if Input.pressed(Key.SPACE):
 			self.world.add(Bullet(self.x + 36, self.y + 12))
+
+	def collision(self):
+		alien = self.collide('alien', self.x, self.y)
+		if alien:
+			alien.destroy()
+			self.destroy()
+			self.world.hud.game_over()
 
 	def destroy(self):
 		self.world.remove(self)

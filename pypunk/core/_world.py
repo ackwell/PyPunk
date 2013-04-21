@@ -51,7 +51,7 @@ class World(Tweener):
 
 	# Called by Engine game loop. Renders contained entities
 	def render(self):
-		for i in self._layer_list:
+		for i in reversed(self._layer_list):
 			e = self._render_last[i]
 			while e:
 				if e.visible:
@@ -334,7 +334,7 @@ class World(Tweener):
 		self._class_count[e._class] -= 1
 
 	def _add_render(self, e):
-		if e._layer in self._render_first:
+		if e._layer in self._render_first and self._render_first[e._layer]:
 			f = self._render_first[e._layer]
 			e._render_next = f
 			f._render_prev = e
@@ -364,7 +364,7 @@ class World(Tweener):
 		e._render_next = e._render_prev = None
 
 	def _add_type(self, e):
-		if e._type in self._type_first and self._type_first[e._type] is not None:
+		if e._type in self._type_first and self._type_first[e._type]:
 			self._type_first[e._type]._type_prev = e
 			e._type_next = self._type_first[e._type]
 			self._type_count[e._type] += 1
