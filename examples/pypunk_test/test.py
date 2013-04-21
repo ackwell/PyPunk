@@ -1,3 +1,7 @@
+import os, sys
+pypunk_path = os.path.abspath('../..')
+sys.path.append(os.path.join(pypunk_path))
+
 from random import random
 from pypunk.core import PP, Engine, World, Entity, Tween
 from pypunk.graphics import Image, Spritemap, Text, Graphiclist
