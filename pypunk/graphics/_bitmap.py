@@ -18,7 +18,7 @@ class Image(Graphic):
 		# If it's a path to an image
 		if isinstance(source, str):
 			# Set the pixels in case I need them down the road (pixel perfect, etc)
-			texture, self.pixels = get_image(source, cache)
+			texture, self.pixels = Image.get_image(source, cache)
 			self.drawable = sfml.Sprite(texture)
 
 			# Set the cliprect if it's been passed
@@ -113,6 +113,22 @@ class Image(Graphic):
 		 tr = self.drawable.get_texture_rect()
 		 return Rectangle(tr.left, tr.top, tr.width, tr.height)
 	clip_rect = property(_get_clip_rect)
+
+	image_cache = {}
+	@classmethod
+	def get_image(cls, loc, cache):
+		if isinstance(loc, str):
+			loc = loc.encode()
+		if loc in cls.image_cache:
+			return cls.image_cache[loc]
+		
+		image = sfml.Image.load_from_file(loc)
+		pixels = image.get_pixels()
+		texture = sfml.Texture.load_from_image(image)
+		t = (texture, pixels)
+		if cache:
+			cls.image_cache[loc] = t
+		return t
 
 
 class Shape(Image):
@@ -290,19 +306,3 @@ class Anim:
 	frame_rate = property(lambda self: self._frame_rate)
 	frame_count = property(lambda self: self._frame_count)
 	loop = property(lambda self: self._loop)
-
-
-image_cache = {}
-def get_image(loc, cache):
-	if isinstance(loc, str):
-		loc = loc.encode()
-	if loc in image_cache:
-		return image_cache[loc]
-	
-	image = sfml.Image.load_from_file(loc)
-	pixels = image.get_pixels()
-	texture = sfml.Texture.load_from_image(image)
-	t = (texture, pixels)
-	if cache:
-		image_cache[loc] = t
-	return t

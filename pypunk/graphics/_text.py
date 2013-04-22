@@ -27,7 +27,7 @@ class Text(Image):
 		# Public variables
 		# self.resizeable = Text.RESIZEABLE
 
-		text = sfml.Text(text, get_font(Text.FONT), Text.SIZE)
+		text = sfml.Text(text, Text.get_font(Text.FONT), Text.SIZE)
 		super().__init__(text)
 
 		for k, v in options.items():
@@ -45,7 +45,7 @@ class Text(Image):
 	# Font property needs to accept Font and str path, if str, get font from cache/whatever 
 	def _set_font(self, value):
 		if isinstance(value, str):
-			value = get_font(value)
+			value = Text.get_font(value)
 		self.drawable.font = value
 	font = property(lambda self: self.drawable.font, _set_font)
 
@@ -53,11 +53,12 @@ class Text(Image):
 		self.drawable.character_size = value
 	size = property(lambda self: self.drawable.character_size, _set_size)
 
-font_cache = {}
-def get_font(loc, cache=True):
-	if loc in font_cache:
-		return font_cache[loc]
-	font = sfml.Font.load_from_file(loc)
-	if cache:
-		font_cache[loc] = font
-	return font
+	font_cache = {}
+	@classmethod
+	def get_font(cls, loc, cache=True):
+		if loc in cls.font_cache:
+			return cls.font_cache[loc]
+		font = sfml.Font.load_from_file(loc)
+		if cache:
+			cls.font_cache[loc] = font
+		return font

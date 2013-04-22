@@ -38,6 +38,10 @@ class Engine(object):
 		Input._bind_events()
 		EventManager.register_event(sfml.Event.CLOSED, self.close)
 
+		# Set up the audio listener, etc
+		sfml.Listener.set_position(0, 0, 10)
+		sfml.Listener.set_direction(0, 0, -10)
+
 	def begin(self):
 		# Switch worlds
 		if (PP._goto):
