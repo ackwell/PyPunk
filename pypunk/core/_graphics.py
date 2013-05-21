@@ -26,7 +26,7 @@ class Graphic(object):
 		b = _hex & 255
 		g = (_hex >> 8) & 255 
 		r = (_hex >> 16) & 255
-		return sfml.Color(r, g, b)
+		return sfml.graphics.Color(r, g, b)
 	@staticmethod
 	def color2hex(color):
 		return color.r*65536 + color.g*256 + color.b

@@ -19,7 +19,7 @@ class Image(Graphic):
 		if isinstance(source, str):
 			# Set the pixels in case I need them down the road (pixel perfect, etc)
 			texture, self.pixels = Image.get_image(source, cache)
-			self.drawable = sfml.Sprite(texture)
+			self.drawable = sfml.graphics.Sprite(texture)
 
 			# Set the cliprect if it's been passed
 			_source_rect = self.drawable.local_bounds
@@ -121,10 +121,10 @@ class Image(Graphic):
 			loc = loc.encode()
 		if loc in cls.image_cache:
 			return cls.image_cache[loc]
-		
-		image = sfml.Image.load_from_file(loc)
+		# Saving pixel info as well in case i need it for pixel-perfect
+		image = sfml.graphics.Image.from_file(loc)
 		pixels = image.get_pixels()
-		texture = sfml.Texture.load_from_image(image)
+		texture = sfml.graphics.Texture.from_image(image)
 		t = (texture, pixels)
 		if cache:
 			cls.image_cache[loc] = t
@@ -149,14 +149,14 @@ class Shape(Image):
 
 class RectangleShape(Shape):
 	def __init__(self, width, height, color=0xFFFFFF, alpha=1):
-		super().__init__(sfml.RectangleShape((width, height)))
+		super().__init__(sfml.graphics.RectangleShape(sfml.system.Vector2(width, height)))
 		self.color = color
 		self.alpha = alpha
 
 
 class CircleShape(Shape):
 	def __init__(self, radius, color=0xFFFFFF, alpha=1):
-		super().__init__(sfml.CircleShape(radius))
+		super().__init__(sfml.graphics.CircleShape(radius))
 		self.color = color
 		self.alpha = alpha
 

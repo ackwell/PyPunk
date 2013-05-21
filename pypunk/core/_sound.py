@@ -10,10 +10,10 @@ class Sfx(object):
 		# Passed a path to the file
 		if isinstance(source, str):
 			if stream:
-				... # create a streming buffer with sfml.Music
+				raise NotImplementedError() # create a streming buffer with sfml.Music
 			else:
 				buf = Sfx.get_sound(source)
-				self.source = sfml.Sound(buf)
+				self.source = sfml.audio.Sound(buf)
 		else:
 			self.source = source
 
@@ -23,7 +23,7 @@ class Sfx(object):
 		self.source.attenuation = 0
 
 	def play(self, vol=1, pan=0):
-		if self.source.status != sfml.Sound.STOPPED:
+		if self.source.status != sfml.audio.SoundSource.STOPPED:
 			self.stop()
 		
 		# Panning is between -100 (left) and 100 (right)
@@ -31,14 +31,14 @@ class Sfx(object):
 	# Allow user to reposition the listener
 	@staticmethod
 	def move_listener(x, y, z):
-		sfml.Listener.set_position(x, y, z)
+		sfml.audio.Listener.set_position((x, y, z))
 
 	sound_cache = {}
 	@classmethod
 	def get_sound(cls, loc, cache=True):
 		if loc in cls.sound_cache:
 			return cls.sound_cache[loc]
-		sound = sfml.SoundBuffer.load_from_file(loc)
+		sound = sfml.audio.SoundBuffer.from_file(loc)
 		if cache:
 			cls.sound_cache[loc] = sound
 		return sound

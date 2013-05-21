@@ -27,7 +27,7 @@ class Text(Image):
 		# Public variables
 		# self.resizeable = Text.RESIZEABLE
 
-		text = sfml.Text(text, Text.get_font(Text.FONT), Text.SIZE)
+		text = sfml.graphics.Text(text, Text.get_font(Text.FONT), Text.SIZE)
 		super().__init__(text)
 
 		for k, v in options.items():
@@ -58,7 +58,7 @@ class Text(Image):
 	def get_font(cls, loc, cache=True):
 		if loc in cls.font_cache:
 			return cls.font_cache[loc]
-		font = sfml.Font.load_from_file(loc)
+		font = sfml.graphics.Font.from_file(loc)
 		if cache:
 			cls.font_cache[loc] = font
 		return font

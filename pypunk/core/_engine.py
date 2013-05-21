@@ -15,7 +15,7 @@ class Engine(object):
 
 		# Private variables
 		self._running = True
-		self._clock = sfml.Clock()
+		self._clock = sfml.system.Clock()
 
 		# Set global game properties
 		PP.width = width
@@ -39,8 +39,8 @@ class Engine(object):
 		EventManager.register_event(sfml.Event.CLOSED, self.close)
 
 		# Set up the audio listener, etc
-		sfml.Listener.set_position(0, 0, 10)
-		sfml.Listener.set_direction(0, 0, -10)
+		sfml.audio.Listener.set_position((0, 0, 10))
+		sfml.audio.Listener.set_direction((0, 0, -10))
 
 	def begin(self):
 		# Switch worlds
@@ -104,10 +104,10 @@ class Engine(object):
 		PP._world.begin()
 		PP._world._update_lists()
 
-class Screen(sfml.RenderWindow):
+class Screen(sfml.graphics.RenderWindow):
 	def __init__(self):
-		super().__init__(sfml.VideoMode(PP.width, PP.height), PP.title)
-		self._color = sfml.Color(32, 32, 32)
+		super().__init__(sfml.window.VideoMode(PP.width, PP.height), PP.title)
+		self._color = sfml.graphics.Color(32, 32, 32)
 
 	def _set_color(self, value):
 		self._color = Graphic.hex2color(value)

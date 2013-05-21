@@ -2,9 +2,9 @@ import math
 import sfml
 
 # Expose the Keyboard, Event and Mouse classes to the PyPunk API
-Key = sfml.Keyboard
-Event = sfml.Event
-Mouse = sfml.Mouse
+Key = sfml.window.Keyboard
+Event = sfml.window.Event
+Mouse = sfml.window.Mouse
 
 
 # Singleton factory class so I can have property classmethods and such
