@@ -12,4 +12,4 @@ Dependencies
 ------------
 
 * Python 3 (Tested in py3.3)
-* [pySFML](ww.python-sfml.org) 1.3.0
+* [pySFML](http://www.python-sfml.org/) 1.3.0
