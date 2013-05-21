@@ -27,7 +27,7 @@ class GameWorld(World):
 		text = Text('Hello', 100, 100, size=48)
 
 		gl = Graphiclist(self.test, text)
-		self.add_graphic(gl, 1)
+		self.add_graphic(gl, -1)
    
 		self.game_entity = GameEntity()
 		self.add(self.game_entity)

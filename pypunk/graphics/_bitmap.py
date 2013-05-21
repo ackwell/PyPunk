@@ -28,7 +28,7 @@ class Image(Graphic):
 					clip_rect.width = _source_rect.width
 				if not clip_rect.height:
 					clip_rect.height = _source_rect.height
-				self.drawable.set_texture_rect(clip_rect)
+				self.drawable.texture_rectangle = clip_rect
 		# Else it might be an internal call to create a subclass
 		elif source:
 			self.drawable = source
@@ -193,7 +193,7 @@ class Spritemap(Image):
 	def render(self, target, point, camera):
 		self._rect.x = self._rect.width * (self._frame % self._columns)
 		self._rect.y = self._rect.height * int(self._frame / self._columns)
-		self.drawable.set_texture_rect(self._rect)
+		self.drawable.texture_rectangle = self._rect
 
 		super().render(target, point, camera)
 
