@@ -36,7 +36,7 @@ class Engine(object):
 
 		# Bind input and close events
 		Input._bind_events()
-		EventManager.register_event(sfml.Event.CLOSED, self.close)
+		EventManager.register_event(sfml.window.CloseEvent, self.close)
 
 		# Set up the audio listener, etc
 		sfml.audio.Listener.set_position((0, 0, 10))
@@ -53,7 +53,7 @@ class Engine(object):
 		while self._running:
 			# Set some variables
 			try:
-				PP.elapsed = self._clock.elapsed_time.as_seconds()
+				PP.elapsed = self._clock.elapsed_time.seconds
 				PP.frame_rate = 1/PP.elapsed
 			except ZeroDivisionError: pass
 			self._clock.restart()

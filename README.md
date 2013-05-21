@@ -1,8 +1,6 @@
 PyPunk2
 =======
 
-**NOTE: A (more) official build of Python-SFML is now avaliable. I'll be porting what's finished so far to it, before I add any further features.**
-
 A python game library (heavily) inspired by the ActionScript3 library FlashPunk by ChevyRay.
 
 Known Issues
@@ -13,5 +11,5 @@ Known Issues
 Dependencies
 ------------
 
-* Python 3.2
+* Python 3 (Tested in py3.3)
 * [pySFML](ww.python-sfml.org) 1.3.0

@@ -3,7 +3,7 @@ import sfml
 
 # Expose the Keyboard, Event and Mouse classes to the PyPunk API
 Key = sfml.window.Keyboard
-Event = sfml.window.Event
+Event = sfml.window # Events are directly in sfml.window
 Mouse = sfml.window.Mouse
 
 
@@ -34,12 +34,10 @@ class _input(Singleton):
 
 	# Called by the Engine to set up initial event bindings
 	def _bind_events(cls):
-		EventManager.register_event(Event.KEY_PRESSED, cls._on_key_pressed)
-		EventManager.register_event(Event.KEY_RELEASED, cls._on_key_released)
-		EventManager.register_event(Event.MOUSE_MOVED, cls._on_mouse_move)
-		EventManager.register_event(Event.MOUSE_BUTTON_PRESSED, cls._on_mouse_pressed)
-		EventManager.register_event(Event.MOUSE_BUTTON_RELEASED, cls._on_mouse_released)
-		EventManager.register_event(Event.MOUSE_WHEEL_MOVED, cls._on_mouse_wheel)
+		EventManager.register_event(Event.KeyEvent, cls._on_key)
+		EventManager.register_event(Event.MouseMoveEvent, cls._on_mouse_move)
+		EventManager.register_event(Event.MouseButtonEvent, cls._on_mouse_button)
+		EventManager.register_event(Event.MouseWheelEvent, cls._on_mouse_wheel)
 
 	# Input define, etc
 	def define(cls, name, *keys):
@@ -111,43 +109,38 @@ class _input(Singleton):
 		for button in cls._mouse_register.values():
 			button['pressed'] = button['released'] = False
 
+		cls.mouse_wheel = False
+
 	# Private callback functions
-	def _on_key_pressed(cls, event):
+	def _on_key(cls, event):
 		# Make sure there's an registry entry
 		if event.code not in cls._key_register:
 			cls._key_register[event.code] = {'pressed':False, 'released':False, 'down':False}
-		# Check that it's not down already, set pressed and down to True
+		
 		key = cls._key_register[event.code]
-		if not key['down']:
+		if event.pressed and not key['down']:
 			key['down'] = key['pressed'] = True
 			# set the last_key
 			cls.last_key = event.code
 
-	def _on_key_released(cls, event):
-		if event.code not in cls._key_register:
-			cls._key_register[event.code] = {'pressed':False, 'released':False, 'down':False}
-		key = cls._key_register[event.code]
-		if key['down']:
+		elif event.released and key['down']:
 			key['down'] = False
 			key['released'] = True
 
 	def _on_mouse_move(cls, event):
-		cls.mouse_x = event.x
-		cls.mouse_y = event.y
+		cls.mouse_x = event.position.x
+		cls.mouse_y = event.position.y
 
-	def _on_mouse_pressed(cls, event):
+	def _on_mouse_button(cls, event):
 		if event.button not in cls._mouse_register:
 			cls._mouse_register[event.button] = {'up':False,'down':False,'pressed':False,'released':False}
 		button = cls._mouse_register[event.button]
-		if not button['down']:
+
+		if event.pressed and not button['down']:
 			button['down'] = button['pressed'] = True
 			button['up'] = False
 
-	def _on_mouse_released(cls, event):
-		if event.button not in cls._mouse_register:
-			cls._mouse_register[event.button] = {'up':False,'down':False,'pressed':False,'released':False}
-		button = cls._mouse_register[event.button]
-		if button['down']:
+		elif event.released and button['down']:
 			button['up'] = button['released'] = True
 			button['down'] = False
 
@@ -171,10 +164,10 @@ class _event_manager(Singleton):
 
 	# Dispatch all waiting events for specified screen object
 	def dispatch_events(cls, screen):
-		for event in screen.iter_events():
+		for event in screen.events:
 			# Check if the event is in the register, if it is, execute callbacks
-			if event.type in cls.event_register:
-				for callback in cls.event_register[event.type]:
+			if type(event) in cls.event_register:
+				for callback in cls.event_register[type(event)]:
 					callback(event)
 					# According to my old code, might have to do some fancy stuff
 					# here to dereg stuff

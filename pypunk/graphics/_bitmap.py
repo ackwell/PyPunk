@@ -117,13 +117,12 @@ class Image(Graphic):
 	image_cache = {}
 	@classmethod
 	def get_image(cls, loc, cache):
-		if isinstance(loc, str):
-			loc = loc.encode()
 		if loc in cls.image_cache:
 			return cls.image_cache[loc]
 		# Saving pixel info as well in case i need it for pixel-perfect
 		image = sfml.graphics.Image.from_file(loc)
-		pixels = image.get_pixels()
+		#advised not to keep this too long, i'll have to look into it when the time comes
+		pixels = image.pixels
 		texture = sfml.graphics.Texture.from_image(image)
 		t = (texture, pixels)
 		if cache:
