@@ -18,7 +18,7 @@ class Image(Graphic):
 		# If it's a path to an image
 		if isinstance(source, str):
 			# Set the pixels in case I need them down the road (pixel perfect, etc)
-			texture, self.pixels = Image.get_image(source, cache)
+			texture, self.pixels = Image._get_image(source, cache)
 			self.drawable = sfml.graphics.Sprite(texture)
 
 			# Set the cliprect if it's been passed
@@ -114,11 +114,11 @@ class Image(Graphic):
 		 return Rectangle(tr.left, tr.top, tr.width, tr.height)
 	clip_rect = property(_get_clip_rect)
 
-	image_cache = {}
+	_image_cache = {}
 	@classmethod
-	def get_image(cls, loc, cache):
-		if loc in cls.image_cache:
-			return cls.image_cache[loc]
+	def _get_image(cls, loc, cache):
+		if loc in cls._image_cache:
+			return cls._image_cache[loc]
 		# Saving pixel info as well in case i need it for pixel-perfect
 		image = sfml.graphics.Image.from_file(loc)
 		#advised not to keep this too long, i'll have to look into it when the time comes
@@ -126,7 +126,7 @@ class Image(Graphic):
 		texture = sfml.graphics.Texture.from_image(image)
 		t = (texture, pixels)
 		if cache:
-			cls.image_cache[loc] = t
+			cls._image_cache[loc] = t
 		return t
 
 
