@@ -79,6 +79,8 @@ class Engine(object):
 			if PP._world._tween:
 				PP._world.update_tweens()
 			PP._world.update()
+		# Clear out any orphaned Sfx that have finished playing
+		Sfx._check_sfx_refs()
 
 	def render(self):
 		# reset Draw target?

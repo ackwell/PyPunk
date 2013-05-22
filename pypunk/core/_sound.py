@@ -22,9 +22,9 @@ class Sfx(object):
 		Sfx.setup_sound(self.source)
 		Sfx.localize_sound(self.source)
 
-	def play(self, vol=1, pan=0):
+	def play(self, vol=1, pan=0, stop_on_remove=False):
 		if self.source.status != sfml.audio.SoundSource.STOPPED:
-			self.stop()
+			...#self.stop()
 		# Make sure sound isn't looping (might have been looping previously)
 		self.source.loop = False
 		# SFML volume is 0 -> 100
@@ -34,10 +34,14 @@ class Sfx(object):
 		pan = PP.clamp(vol, -1, 1)
 		Sfx.localize_sound(self.source, pan*100, 0)
 
+		# Keep reference to sounds that should persist until they finish playing.
+		if not stop_on_remove:
+			Sfx._add_sfx_ref(self)
+
 		self.source.play()
 
-	def loop(self, vol=1, pan=0):
-		self.play(vol, pan)
+	def loop(self, vol=1, pan=0, stop_on_remove=True):
+		self.play(vol, pan, stop_on_remove)
 		self.source.loop = True
 
 
@@ -63,6 +67,18 @@ class Sfx(object):
 	@classmethod
 	def localize_sound(cls, sound, x=0, y=0):
 		sound.position = (x, y, 0)
+
+	# Used to keep tabs on sounds that should play out before being removed
+	sfx_refs = []
+	@classmethod
+	def _add_sfx_ref(cls, sfx):
+		if sfx not in cls.sfx_refs:
+			cls.sfx_refs.append(sfx)
+
+	@classmethod
+	def _check_sfx_refs(cls):
+		cls.sfx_refs = [ref for ref in cls.sfx_refs if\
+			(lambda ref: ref.source.status != sfml.audio.SoundSource.STOPPED)(ref)]
 
 	sound_cache = {}
 	@classmethod
