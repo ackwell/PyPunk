@@ -1,9 +1,10 @@
 
 import sfml
+from ._pp import PP
 
 class Sfx(object):
-	def __init__(self, source, complete=None, t='', stream=False):
-		self._type = t
+	def __init__(self, source, complete=None, _type='', stream=False):
+		self._type = _type
 		self.complete = complete
 
 		self.source = None
@@ -17,21 +18,51 @@ class Sfx(object):
 		else:
 			self.source = source
 
-		# Set minimum distance and attenuation for panning.
-		# I'm sure people can fiddle with these themselves if they absolutely must.
-		self.source.min_distance = 100
-		self.source.attenuation = 0
+		# For panning, etc
+		Sfx.setup_sound(self.source)
+		Sfx.localize_sound(self.source)
 
 	def play(self, vol=1, pan=0):
 		if self.source.status != sfml.audio.SoundSource.STOPPED:
 			self.stop()
-		
-		# Panning is between -100 (left) and 100 (right)
+		# Make sure sound isn't looping (might have been looping previously)
+		self.source.loop = False
+		# SFML volume is 0 -> 100
+		vol = PP.clamp(vol, 0, 1)
+		self.source.volume = vol * 100
+		# SFML Panning is between -100 (left) and 100 (right)
+		pan = PP.clamp(vol, -1, 1)
+		Sfx.localize_sound(self.source, pan*100, 0)
 
-	# Allow user to reposition the listener
-	@staticmethod
-	def move_listener(x, y, z):
-		sfml.audio.Listener.set_position((x, y, z))
+		self.source.play()
+
+	def loop(self, vol=1, pan=0):
+		self.play(vol, pan)
+		self.source.loop = True
+
+
+	listener_depth = 10
+	base_att = 0
+	base_min_dist = 100
+	@classmethod
+	def setup_listener(cls, min_dist=100, att=0, listener_depth=10):
+		cls.listener_depth = listener_depth
+		cls.base_att = att
+		cls.base_min_dist = min_dist
+		sfml.audio.Listener.set_direction((0, 0, -cls.listener_depth))
+
+	@classmethod
+	def localize_listener(cls, x=0, y=0):
+		sfml.audio.Listener.set_position((x, y, cls.listener_depth))
+
+	@classmethod
+	def setup_sound(cls, sound):
+		sound.min_distance = cls.base_min_dist
+		sound.attenuation = cls.base_att
+
+	@classmethod
+	def localize_sound(cls, sound, x=0, y=0):
+		sound.position = (x, y, 0)
 
 	sound_cache = {}
 	@classmethod

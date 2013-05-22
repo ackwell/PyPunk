@@ -34,6 +34,26 @@ class _pp(Singleton):
 		cls._rect = None
 		cls._entity = None
 
+	def _set_world(cls, world):
+		if cls._world == world:
+			return
+		cls._goto = world
+	world = property(lambda cls:cls._world, _set_world)
+
+	def choose(cls, *objs):
+		c = objs[0] if len(objs) == 1 and isinstance(objs[0], list) else objs
+		return random.choice(c)
+
+	def clamp(cls, value, _min, _max):
+		if _max > _min:
+			if value < _min: return _min
+			if value > _max: return _max
+			return value
+		else:
+			if value < _max: return _max
+			if value > _min: return _min
+			return value
+
 	# Global objects for rendering/collision/etc
 	# Only created when first requested to prevent circular imports
 	def _get_point(cls):
@@ -70,16 +90,6 @@ class _pp(Singleton):
 			cls._entity = Entity()
 		return cls._entity
 	entity = property(_get_entity)
-
-	def _set_world(cls, world):
-		if cls._world == world:
-			return
-		cls._goto = world
-	world = property(lambda cls:cls._world, _set_world)
-
-	def choose(cls, *objs):
-		c = objs[0] if len(objs) == 1 and isinstance(objs[0], list) else objs
-		return random.choice(c)
 
 	def _get_console(cls):
 		if not cls._console:

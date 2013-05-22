@@ -2,6 +2,7 @@ import sfml
 from ._graphics import Graphic
 from ._pp import PP
 from ._world import World
+from ._sound import Sfx
 from ..geom import Rectangle
 from ..utils import Input, EventManager
 
@@ -39,8 +40,8 @@ class Engine(object):
 		EventManager.register_event(sfml.window.CloseEvent, self.close)
 
 		# Set up the audio listener, etc
-		sfml.audio.Listener.set_position((0, 0, 10))
-		sfml.audio.Listener.set_direction((0, 0, -10))
+		Sfx.setup_listener()
+		Sfx.localize_listener()
 
 	def start(self):
 		# Switch worlds
