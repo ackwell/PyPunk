@@ -1,11 +1,12 @@
 
 import math
 
-from pypunk.core import PP, Entity
+from pypunk.core import PP, Entity, Sfx
 from pypunk.graphics import Image
 
 class Alien(Entity):
 	spr_alien = 'assets/alien.png'
+	snd_alien_die = 'assets/explosion-alien.wav'
 
 	def __init__(self, x, y):
 		super().__init__(x, y)
@@ -16,6 +17,8 @@ class Alien(Entity):
 		self.height = 32
 		self.graphic = Image(Alien.spr_alien)
 		self.type = 'alien'
+
+		self.alien_die = Sfx(Alien.snd_alien_die)
 
 	def update(self):
 		self.x -= self.speed * PP.elapsed
@@ -28,6 +31,7 @@ class Alien(Entity):
 			self.world.hud.score += 1
 			bullet.destroy()
 			self.destroy()
+			self.alien_die.play()
 
 	def destroy(self):
 		self.world.remove(self)

@@ -1,10 +1,12 @@
 
-from pypunk.core import PP, Entity
+from pypunk.core import PP, Entity, Sfx
 from pypunk.graphics import Image
 from pypunk.utils import Input, Key
 
 class Ship(Entity):
 	spr_ship = 'assets/ship.png'
+	snd_ship_die = 'assets/explosion-ship.wav'
+	snd_bullet_shoot = 'assets/bullet.wav'
 
 	def __init__(self):
 		super().__init__(50, 50)
@@ -15,6 +17,9 @@ class Ship(Entity):
 		self.width = 40
 		self.height = 16
 		self.type = 'ship'
+
+		self.ship_die = Sfx(Ship.snd_ship_die)
+		self.bullet_shoot = Sfx(Ship.snd_bullet_shoot)
 
 	def update(self):
 		self.move()
@@ -40,12 +45,14 @@ class Ship(Entity):
 	def shoot(self):
 		if Input.pressed(Key.SPACE):
 			self.world.add(Bullet(self.x + 36, self.y + 12))
+			self.bullet_shoot.play()
 
 	def collision(self):
 		alien = self.collide('alien', self.x, self.y)
 		if alien:
 			alien.destroy()
 			self.destroy()
+			self.ship_die.play()
 			self.world.hud.game_over()
 
 	def destroy(self):

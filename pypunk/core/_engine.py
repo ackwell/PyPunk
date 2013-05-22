@@ -42,7 +42,7 @@ class Engine(object):
 		sfml.audio.Listener.set_position((0, 0, 10))
 		sfml.audio.Listener.set_direction((0, 0, -10))
 
-	def begin(self):
+	def start(self):
 		# Switch worlds
 		if (PP._goto):
 			self._check_world()

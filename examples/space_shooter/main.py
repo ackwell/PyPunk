@@ -12,7 +12,7 @@ from enemy import Alien
 def main():
 	engine = Engine(640, 480, 60, 'Space Shooter')
 	PP.world = GameRoom()
-	engine.begin()
+	engine.start()
 
 
 class GameRoom(World):
