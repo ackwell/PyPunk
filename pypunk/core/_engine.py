@@ -7,21 +7,7 @@ from ..geom import Rectangle
 from ..utils import Input, EventManager
 
 class Engine(object):
-	"""
-	Main game class. Manages game loop.
-
-	:var paused: If the game should stop updating/rendering. Default: `False`
-	"""
-	
 	def __init__(self, width, height, frame_rate=60, title="PyPunk"):
-		"""
-		Constructor. Defines startup information about your game.
-
-		:param integer width:      The width of your game.
-		:param integer height:     The height of your game.
-		:param integer frame_rate: The game framerate, in frames per second.
-		:param string title:       The window caption for your game.
-		"""
 		# Public variables
 		self.paused       = False
 		#self.max_elapsed  = 0.0333
@@ -56,10 +42,6 @@ class Engine(object):
 		Sfx.localize_listener()
 
 	def start(self):
-		"""
-		Starts the PyPunk loop. Should be called after setting PP.world so as
-		to start running the game.
-		"""
 		# Switch worlds
 		if (PP._goto):
 			self._check_world()
@@ -86,7 +68,6 @@ class Engine(object):
 		PP.screen.close()
 
 	def update(self):
-		"""Updates the game, updating the World and Entities."""
 		PP._world._update_lists()
 		if PP._goto:
 			self._check_world()
@@ -100,7 +81,6 @@ class Engine(object):
 		Sfx._check_sfx_refs()
 
 	def render(self):
-		"""Renders the game, rendering the World and Entities."""
 		# reset Draw target?
 		PP.screen.clear(PP.screen._color)
 		if PP._world.visible:
@@ -108,7 +88,6 @@ class Engine(object):
 		PP.screen.display()
 
 	def close(self, event=None):
-		"""Signals the Engine to stop it's loop, and exit the game."""
 		self._running = False
 
 	def _check_world(self):

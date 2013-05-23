@@ -1,4 +1,5 @@
 /flashpunk*/
 /*.sublime*
 __pycache__
-/docs/
+/docs/_build
+/docs/_templates

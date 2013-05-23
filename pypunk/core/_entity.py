@@ -2,18 +2,40 @@ from ._pp import PP
 from ._tweening import Tweener
 
 class Entity(Tweener):
+	"""
+	Main game Entity class, updated by World.
+
+	:param x: X position to place the Entity.
+	:param y: Y position to place the Entity.
+	:param graphic: Graphic to assign to the Entity.
+	:param mask:    Mask to assign to the Entity.
+	"""
 	def __init__(self, x=0, y=0, graphic=None, mask=None):
+		"""
+		If you override this, make sure you call ``super().__init__()``
+		to ensure the Entity instance is instanciated correctly.
+		"""
 		super().__init__()
 
 		# Public variables
+		#: If the Entity should render. Default: ``True``
 		self.visible = True
+		#: If the Entity should respond to collision checks. Default: ``True``
 		self.collidable = True
+		#: X position of the Entity in the World.
 		self.x = x
+		#: Y position of the Entity in the World.
 		self.y = y
+		#: Width of the Entity's hitbox.
 		self.width = 0
+		#: Height of the Entity's hitbox.
 		self.height = 0
+		#: X origin of the Entity's hitbox.
 		self.origin_x = 0
+		#: Y origin of the Entity's hitbox.
 		self.origin_y = 0
+		#: The Screen target to draw the entity onto. Leave as None
+		#: to render to the current window.
 		self.render_target = None
 
 		# Private variables
@@ -44,13 +66,23 @@ class Entity(Tweener):
 			self.mask = mask
 		#self.HITBOX.assign_to(self)
 
-	def added(self): pass
+	def added(self):
+		"""Override this, called when the Entity is added to a World."""
+		pass
 
-	def removed(self): pass
+	def removed(self):
+		"""Override this, called when the Entity is removed from a World."""
+		pass
 
-	def update(self): pass
+	def update(self):
+		"""Override this, called as part of the frame update loop."""
+		pass
 
 	def render(self):
+		"""
+		Renders the Entity. If you override this for special behaviour,
+		remember to call ``super().render()`` to render the Entity's graphic.
+		"""
 		if self._graphic and self._graphic.visible:
 			if self._graphic.relative:
 				self._point.x = self.x
@@ -62,6 +94,14 @@ class Entity(Tweener):
 			self._graphic.render(self.render_target if self.render_target else PP.screen, self._point, self._camera)
 
 	def collide(self, t, x, y):
+		"""
+		Checks for a collision against an Entity type.
+
+		:param type: The Entity type to check against.
+		:param x:    Virtual x position to place this Entity.
+		:param y:    Virtual y position to place this Entity.
+		:return:     The first Entity collided with, or ``None`` if no collision.
+		"""
 		if not self._world:
 			return None
 
@@ -76,6 +116,14 @@ class Entity(Tweener):
 		return None
 
 	def collide_types(self, types, x, y):
+		"""
+		Checks for collision against multiple Entity types.
+
+		:param types: A list of Entity types to check against.
+		:param x:     Virtual x position to place this entity.
+		:param y:     Virtual y position to place this entity.
+		:return:      The first Entity collided with, or ``None`` if no collision.
+		"""
 		if not self._world:
 			return None
 
@@ -90,7 +138,15 @@ class Entity(Tweener):
 		return None
 
 	def collide_with(self, e, x, y):
-	# Not altogether sure why this is needed, keeping in in case magic
+		"""
+		Checks if this Entity collides with a specific Entity.
+
+		:param e: The Entity to collide against.
+		:param x: Virtual x position to place this entity.
+		:param y: Virtual y position to place this entity.
+		:return:  The Entity ``e`` if they overlap, else ``None``.
+		"""
+		# Not altogether sure why this is needed, keeping in in case magic
 		self._x, self._y = self.x, self.y
 		self.x, self.y = x, y
 
@@ -112,6 +168,16 @@ class Entity(Tweener):
 		return None
 
 	def collide_rect(self, x, y, r_x, r_y, r_width, r_height):
+		"""
+		Checks if this Entity overlaps the specified rectangle.
+
+		:param x:   Virtual x position to place this Entity.
+		:param y:   Virtual y position to place this Entity.
+		:param r_x: X position of the rectangle.
+		:param r_y: Y position of the Rectangle.
+		:param r_width:  Height of the rectangle.
+		:param r_height: Width of the Rectangle.
+		"""
 		if x - self.origin_x + self.width >= r_x and y - self.origin_y >= r_y \
 		and x - self.origin_x <= r_x + r_width and y - self.origin_y <= r_y + r_height:
 			if not self._mask:
@@ -129,6 +195,14 @@ class Entity(Tweener):
 		return False
 
 	def collide_point(self, x, y, p_x, p_y):
+		"""
+		Checks if this Entity overlaps the specified position.
+
+		:param x:   Virtual x position to place this Entity.
+		:param y:   Virtual y position to place this Entity.
+		:param p_x: X position of the rectangle.
+		:param p_y: Y position of the Rectangle.
+		"""
 		if p_x >= x - self.origin_x and p_y >= y - self.origin_y \
 		and p_x < x - self.origin_x + self.width and p_y < y - self.origin_y + self.height:
 			if not self._mask:
@@ -145,17 +219,24 @@ class Entity(Tweener):
 			self.x, self.y = self._x, self._y
 		return False
 
-	# collide_into
+	"""
+	.. todo::
 
-	# collide_types_into
+	   # collide_into
+	   # collide_types_into
+	   # onCamera
+	"""
 
-	# onCamera
-
+	#: Read only. The World object this Entity has been added to.
 	world = property(lambda self:self._world)
-
+	#MISSING SOME PROPERTIES IN HERE.
+	#: Read only. The leftmost position of the Entity's hitbox.
 	left = property(lambda self:self.x-origin_x)
+	#: Read only. The rightmost position of the Entity's hitbox.
 	right = property(lambda self:self.left+self.width)
+	#: Read only. The topmost position of the Entity's hitbox.
 	top = property(lambda self:self.y-self.origin_y)
+	#: Read only. The topmost position of the Entity's hitbox.
 	bottom = property(lambda self:self.top+self.height)
 	center_x = property(lambda self:self.left+self.width/2)
 	center_y = property(lambda self:self.top+self.height/2)

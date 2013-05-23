@@ -358,7 +358,7 @@ class QuadPath(Motion):
 		# Find total distance of the path
 		i = 0
 		self._distance = 0
-		while i < len(self._curve) - 1
+		while i < len(self._curve) - 1:
 			self._curve_d[i] = self._curve_length(self._curve[i], self._points[i + 1], self._curve[i + 1])
 			self._distance += self._curve_d[i]
 			i += 1
