@@ -1,9 +1,9 @@
 World
 =====
 
-.. module:: pypunk.core
+.. currentmodule:: pypunk.core
 
-.. class:: World()
+.. class:: World
 
    Updated by Engine, main game container that holds all currently
    active Entities.
@@ -18,6 +18,14 @@ World
 
       Make sure to call ``super().__init__()`` if overriding to ensure
       World instance is set up correctly.
+
+   .. attribute:: visible = True
+
+      If False, the World will not be rendered.
+
+   .. attribute:: self.camera = Point()
+
+      Point used to modify location entities are drawn at.
 
    .. method:: begin()
 
@@ -153,7 +161,7 @@ World
 
       Read only. The Entity that will be rendered first/last by the World.
 
-   .. attrbute:: unique_types
+   .. attribute:: unique_types
 
       Read only. The number of different types that have been added to the World.
 

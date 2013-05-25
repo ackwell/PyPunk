@@ -1,7 +1,7 @@
 Core
 ====
 
-.. automodule:: pypunk.core
+.. module:: pypunk.core
 
 Child classes:
 
