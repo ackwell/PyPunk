@@ -5,8 +5,8 @@ from ..geom import Point
 
 class World(Tweener):
 	def __init__(self):
-		super().__init__()
-		
+		Tweener.__init__(self)
+
 		# Public variables
 		self.visible = True
 		self.camera = Point()

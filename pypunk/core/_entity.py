@@ -3,7 +3,7 @@ from ._tweening import Tweener
 
 class Entity(Tweener):
 	def __init__(self, x=0, y=0, graphic=None, mask=None):
-		super().__init__()
+		Tweener.__init__(self)
 
 		# Public variables
 		self.visible = True
