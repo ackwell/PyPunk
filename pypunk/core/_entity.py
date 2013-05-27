@@ -187,7 +187,7 @@ class Entity(Tweener):
 			g.assign()
 	graphic = property(lambda self:self._graphic, _set_graphic)
 
-	def add_graphic(g):
+	def add_graphic(self, g):
 		raise NotImplementedError()
 
 	def set_hitbox(self, width=0, height=0, origin_x=0, origin_y = 0):
