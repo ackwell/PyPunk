@@ -3,7 +3,7 @@ from ..core import Tween, PP, PyPunkError
 
 class Alarm(Tween):
 	def __init__(self, duration, complete=None, _type=0):
-		super().__init__(duration, _type, complete, None)
+		Tween.__init__(self,duration, _type, complete, None)
 
 	def reset(self, duration):
 		self._target = duration
@@ -21,7 +21,7 @@ class AngleTween(Tween):
 		self._start = 0
 		self._range = 0
 
-		super().__init__(0, _type, complete)
+		Tween.__init__(self,0, _type, complete)
 
 	def tween(self, from_angle, to_angle, duration, ease=None):
 		self._start = self.angle = from_angle
@@ -38,7 +38,7 @@ class AngleTween(Tween):
 		self.start()
 
 	def update(self):
-		super().update()
+		Tween.update(self)
 		self.angle = (self._start + self._range * self._t) % 360
 		if self.angle < 0:
 			self.angle += 360
@@ -61,7 +61,7 @@ class ColorTween(Tween):
 		self._range_g = 0
 		self._range_b = 0
 
-		super().__init__(0, _type, complete)
+		Tween.__init__(self, 0, _type, complete)
 
 	def tween(self, duration, from_color, to_color, from_alpha=1, to_alpha=1, ease=None):
 		from_color &= 0xFFFFFF
@@ -83,7 +83,7 @@ class ColorTween(Tween):
 		self.start()
 
 	def update(self):
-		super().update()
+		Tween.update(self)
 		self.alpha = self._start_a + self._range_a * self._t
 		self._r = int((self._start_r + self._range_r * self._t) * 255)
 		self._g = int((self._start_g + self._range_g * self._t) * 255)
@@ -102,7 +102,7 @@ class NumTween(Tween):
 		self._start = 0
 		self._range = 0
 
-		super().__init__(0, _type, complete)
+		Tween.__init__(self,0, _type, complete)
 
 	def tween(self, from_value, to_value, duration, ease=None):
 		self._start = self.value = from_value
@@ -112,7 +112,7 @@ class NumTween(Tween):
 		self.start()
 
 	def update(self):
-		super().update()
+		Tween.update(self)
 		self.value = self._start + self._range * self._t
 
 
@@ -123,7 +123,7 @@ class VarTween(Tween):
 		self._start = 0
 		self._range = 0
 
-		super().__init__(0, _type, complete)
+		Tween.__init__(self,0, _type, complete)
 
 	def tween(self, _object, _property, to, duration, ease=None):
 		self._object = _object
@@ -138,7 +138,7 @@ class VarTween(Tween):
 		start()
 
 	def update(self):
-		super().update()
+		Tween.update(self)
 		self._object.setattr(self._property, self._start + self._range * self._t)
 
 
@@ -149,7 +149,7 @@ class MultiVarTween(Tween):
 		self._start = []
 		self._range = []
 
-		super().__init__(0, _type, complete)
+		Tween.__init__(self,0, _type, complete)
 
 	def tween(self, _object, values, duration, ease=None):
 		self._object = _object
@@ -167,7 +167,7 @@ class MultiVarTween(Tween):
 		self.start()
 
 	def update(self):
-		super().update()
+		Tween.update(self)
 		i = len(self._vars)
 		while i:
 			self._object.setattr(self._vars[i], self._start[i] + self.range[i] * self._t)

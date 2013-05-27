@@ -107,7 +107,7 @@ class Engine(object):
 
 class Screen(sfml.graphics.RenderWindow):
 	def __init__(self):
-		super().__init__(sfml.window.VideoMode(PP.width, PP.height), PP.title)
+		sfml.graphics.RenderWindow.__init__(self, sfml.window.VideoMode(PP.width, PP.height), PP.title)
 		self._color = sfml.graphics.Color(32, 32, 32)
 
 	def _set_color(self, value):

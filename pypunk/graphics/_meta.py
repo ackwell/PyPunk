@@ -3,7 +3,7 @@ from ..geom import Point
 
 class Graphiclist(Graphic):
 	def __init__(self, *graphics):
-		super().__init__()
+		Graphic.__init__(self)
 
 		# Private variables
 		self._graphics = []
