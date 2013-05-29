@@ -160,9 +160,9 @@ class Entity(Tweener):
 		if not self._world:
 			self._layer = value
 			return
-		self._world._remove_layer(self)
+		self._world._remove_render(self)
 		self._layer = value
-		self._world._add_layer(self)
+		self._world._add_render(self)
 	layer = property(lambda self:self._layer, _set_layer)
 
 	def _set_type(self, value):
