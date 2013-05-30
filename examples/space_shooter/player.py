@@ -24,8 +24,8 @@ class Ship(Entity):
 		# should be indicative of the size of the sprite (in most cases.)
 		self.width = 40
 		self.height = 16
-		# The type of an entity is an arbitary string that categorises what it is
-		# Types are used for several things, most predominanrly collision checking,
+		# The type of an entity is an arbitrary string that categorises what it is
+		# Types are used for several things, most predominantly collision checking,
 		# where you can specify a type, which then will restrict collisions detected
 		# to Entities of that type.
 		self.type = 'ship'
@@ -55,7 +55,7 @@ class Ship(Entity):
 		if Input.check(Key.UP):
 			self.y -= self.speed * PP.elapsed 
 
-	# Make sure the ship doesn't go offscreen.
+	# Make sure the ship doesn't go off-screen.
 	def constrain(self):
 		self.clamp_horizontal(16, PP.screen.width - 16)
 		self.clamp_vertical(16, PP.screen.height - 16)
@@ -68,7 +68,7 @@ class Ship(Entity):
 			self.bullet_shoot.play()
 
 	# Check to see if we have collided with an alien (notice usage of type to
-	# filter collision check). If we have collided, it's game oveer, play the
+	# filter collision check). If we have collided, it's game over, play the
 	# appropriated SFX to imply as such.
 	def collision(self):
 		alien = self.collide('alien', self.x, self.y)
@@ -78,7 +78,7 @@ class Ship(Entity):
 			self.ship_die.play()
 			self.world.hud.game_over()
 
-	# Remvoes the entity from the world.
+	# Removes the entity from the world.
 	def destroy(self):
 		self.world.remove(self)
 
@@ -101,7 +101,7 @@ class Bullet(Entity):
 		self.type = 'bullet'
 
 	def update(self):
-		# If the bullet is offscreen, remove it.
+		# If the bullet is off-screen, remove it.
 		self.x += self.speed * PP.elapsed
 		if self.x > PP.screen.width:
 			self.destroy()
