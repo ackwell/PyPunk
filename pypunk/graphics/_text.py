@@ -28,7 +28,7 @@ class Text(Image):
 		# self.resizeable = Text.RESIZEABLE
 
 		text = sfml.graphics.Text(text, Text._get_font(Text.FONT), Text.SIZE)
-		super().__init__(text)
+		Image.__init__(self, text)
 
 		for k, v in options.items():
 			if not hasattr(self, k):

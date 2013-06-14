@@ -1,3 +1,9 @@
+"""
+The ``core`` module provides the base functionality of the
+framework, such as World and Entity management, and the
+main game loop.
+"""
+
 # Import the other core classes
 from ._engine import Engine
 from ._entity import Entity

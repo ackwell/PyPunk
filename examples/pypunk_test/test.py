@@ -12,7 +12,7 @@ from pypunk.tweens.misc import ColorTween
 
 class GameWorld(World):
 	def __init__(self):
-		super().__init__()
+		World.__init__(self)
 
 		self.add_graphic(Image('EntityImage2.png'), 0, 50, 50)
 
@@ -40,13 +40,13 @@ class GameWorld(World):
 		PP.screen.color = int(random() * 0xFFFFFF)
 
 	def update(self):
-		super().update()
+		World.update(self)
 		self.test.color = self.colortween.color
 
 
 class GameEntity(Entity):
 	def __init__(self):
-		super().__init__()
+		Entity.__init__(self)
 
 		self._time_interval = 0
 		self.graphic = Spritemap('EntitySheet.png', 40, 20, self.on_animation_end)
@@ -83,7 +83,7 @@ class GameEntity(Entity):
 
 class Button(Entity):
 	def __init__(self, x=0, y=0, callback=None, *args, **kwargs):
-		super().__init__(x, y)
+		Entity.__init__(self, x, y)
 		self._map = None
 		self._callback = callback
 		self._args = args

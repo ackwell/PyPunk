@@ -8,7 +8,7 @@ from ..geom import Point, Rectangle
 
 class Image(Graphic):
 	def __init__(self, source, clip_rect=None, cache=True):
-		super().__init__()
+		Graphic.__init__(self)
 		
 		# Private Variables
 		self._scale = 1
@@ -148,14 +148,14 @@ class Shape(Image):
 
 class RectangleShape(Shape):
 	def __init__(self, width, height, color=0xFFFFFF, alpha=1):
-		super().__init__(sfml.graphics.RectangleShape(sfml.system.Vector2(width, height)))
+		Shape.__init__(self, sfml.graphics.RectangleShape(sfml.system.Vector2(width, height)))
 		self.color = color
 		self.alpha = alpha
 
 
 class CircleShape(Shape):
 	def __init__(self, radius, color=0xFFFFFF, alpha=1):
-		super().__init__(sfml.graphics.CircleShape(radius))
+		Shape.__init__(self, sfml.graphics.CircleShape(radius))
 		self.color = color
 		self.alpha = alpha
 
@@ -176,7 +176,7 @@ class Spritemap(Image):
 
 		# Init
 		self._rect = Rectangle(0, 0, frame_width, frame_height)
-		super().__init__(source, self._rect)
+		Image.__init__(self, source, self._rect)
 		source = self.drawable.texture
 		if not frame_width:
 			_rect.width = source.width
@@ -195,7 +195,7 @@ class Spritemap(Image):
 		self._rect.y = self._rect.height * int(self._frame / self._columns)
 		self.drawable.texture_rectangle = self._rect
 
-		super().render(target, point, camera)
+		Image.render(self, target, point, camera)
 
 	def update(self):
 		if self._anim and not self.complete:

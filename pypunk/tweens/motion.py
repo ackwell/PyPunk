@@ -8,7 +8,7 @@ class Motion(Tween):
 		self._y = 0
 		self._object = None
 
-		super().__init__(duration, _type, complete, ease)
+		Tween.__init__(self, duration, _type, complete, ease)
 
 	def _set_x(self, value):
 		self._x = value
@@ -52,7 +52,7 @@ class LinearMotion(Motion):
 		self.set_motion(from_x, from_y, to_x, to_y, self.distance / speed, ease)
 
 	def update(self):
-		super().update()
+		Motion.update(self)
 		self.x = self._from.x + self._move.x * self._t
 		self.y = self._from.y + self._move.y * self._t
 
@@ -76,7 +76,7 @@ class LinearPath(Motion):
 		self._prev = None
 		self._next = None
 
-		super().__init__(0, complete, _type, None)
+		Motion.__init__(self, 0, complete, _type, None)
 		self._point_d[0] = self._point_t[0] = 0
 
 	def set_motion(self, duration, ease=None):
@@ -114,10 +114,10 @@ class LinearPath(Motion):
 
 	def start(self):
 		self._index = 0
-		super().star()
+		Motion.start(self)
 
 	def update(self):
-		super().update()
+		Motion.update(self)
 		if len(self._points) == 1:
 			self.x = self._points[0].x
 			self.y = self._points[0].y
@@ -155,7 +155,7 @@ class CircularMotion(Motion):
 
 		self._CIRC = math.pi * 2
 
-		super().__init__(0, complete, _type, None)
+		Motion.__init__(self, 0, complete, _type, None)
 
 	def set_motion(self, center_x, center_y, radius, angle, clockwise, duration, ease=None):
 		self._center.x = center_x
@@ -172,7 +172,7 @@ class CircularMotion(Motion):
 			clockwise, (radius * self._CIRC) / speed, ease)
 
 	def update(self):
-		super().update()
+		Motion.update(self)
 		self._angle = self._angle_start + self._angle_finish * self._t
 		self.x = _center_x + math.cos(self._angle) * self._radius
 		self.y = _center_y + math.sin(self._angle) * self._radius
@@ -188,7 +188,7 @@ class CubicMotion(Motion):
 		self._a = Point()
 		self._b = Point()
 
-		super().__init__(0, complete, _type, None)
+		Motion.__init__(self, 0, complete, _type, None)
 
 	def set_motion(self, from_x, from_y, a_x, a_y, b_x, b_y, to_x, to_y, duration, ease=None):
 		self.x = self._from.x = from_x
@@ -204,7 +204,7 @@ class CubicMotion(Motion):
 		self.start()
 
 	def update(self):
-		super().update()
+		Motion.update(self)
 		self.x = self._t**3 * (self._to.x + 3 * (self._a.x - self._b.x) - self._from.x) + \
 			3 * self._t**2 * (self._from.x - 2 * self._a.x + self._b.x) + 3 * self._t * \
 			(self._a.x - self._from.x) + self._from.x
@@ -220,7 +220,7 @@ class QuadMotion(Motion):
 		self._to = Point()
 		self._control = Point()
 
-		super().__init__(0, complete, _type, None)
+		Motion.__init__(self, 0, complete, _type, None)
 
 	def set_motion(self, from_x, from_y, control_x, control_y, to_x, to_y, duration, ease=None):
 		self._distance = -1
@@ -237,7 +237,7 @@ class QuadMotion(Motion):
 		self.set_motion(from_x, from_y, control_x, control_y, to_x, to_y, self.distance / speed, ease)
 
 	def update(self):
-		super().update()
+		Motion.update(self)
 		self.x = self._from.x * (1 - self._t)**2 + self._control.x * 2 * (1 - _t) * \
 			self._t + self._to.x * self._t**2;
 		self.y = self._from.y * (1 - self._t)**2 + self._control.y * 2 * (1 - _t) * \
@@ -284,7 +284,7 @@ class QuadPath(Motion):
 		self._b = None
 		self._c = None
 
-		super().__init__(0, complete, _type, None)
+		Motion.__init__(self, 0, complete, _type, None)
 		self._curve_t[0] = 0
 
 	def set_motion(self, duration, ease=None):
@@ -314,10 +314,10 @@ class QuadPath(Motion):
 
 	def start(self):
 		self._index = 0
-		super().start()
+		Motion.start(self)
 
 	def update():
-		super().update()
+		Motion.update(self)
 		if self._index < len(self._curve) - 1:
 			while self._t > self._curve_t[self._index +1]:
 				self._index += 1
@@ -358,7 +358,7 @@ class QuadPath(Motion):
 		# Find total distance of the path
 		i = 0
 		self._distance = 0
-		while i < len(self._curve) - 1
+		while i < len(self._curve) - 1:
 			self._curve_d[i] = self._curve_length(self._curve[i], self._points[i + 1], self._curve[i + 1])
 			self._distance += self._curve_d[i]
 			i += 1

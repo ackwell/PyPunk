@@ -5,8 +5,8 @@ from ..geom import Point
 
 class World(Tweener):
 	def __init__(self):
-		super().__init__()
-		
+		Tweener.__init__(self)
+
 		# Public variables
 		self.visible = True
 		self.camera = Point()
@@ -30,14 +30,10 @@ class World(Tweener):
 		self._type_first = {}
 		self._type_count = {}
 
-
-	# Called when the world is switched to
 	def begin(self): pass
 
-	# Called when the world is switched away from
 	def end(self): pass
 
-	# Called by Engine game loop. Updates contained entities.
 	def update(self):
 		e = self._update_first
 		while e:
@@ -57,8 +53,10 @@ class World(Tweener):
 				if e.visible:
 					e.render()
 				e = e._render_prev
-
+	
+	#: Read only. X position of the mouse in the World.
 	mouse_x = property(lambda self:PP.screen.mouse_x+self.camera.x)
+	#: Read only. Y position of the mouse in the World
 	mouse_y = property(lambda self:PP.screen.mouse_y+self.camera.y)
 
 	def add(self, e):
@@ -147,7 +145,7 @@ class World(Tweener):
 			self._render_first[e._layer] = e
 		return True
 
-	def send_backwards(self, e):
+	def send_backward(self, e):
 		if e._world != self or not e._render_next:
 			return False
 		e._render_next._render_prev = e._render_prev
@@ -184,7 +182,6 @@ class World(Tweener):
 		return self._layer_count[l]
 
 	first = property(lambda self: self._update_first)
-
 	layers = property(lambda self: len(self._layer_list))
 
 	def type_first(self, t):

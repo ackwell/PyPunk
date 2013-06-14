@@ -3,7 +3,7 @@ from ._tweening import Tweener
 
 class Entity(Tweener):
 	def __init__(self, x=0, y=0, graphic=None, mask=None):
-		super().__init__()
+		Tweener.__init__(self)
 
 		# Public variables
 		self.visible = True
@@ -90,7 +90,7 @@ class Entity(Tweener):
 		return None
 
 	def collide_with(self, e, x, y):
-	# Not altogether sure why this is needed, keeping in in case magic
+		# Not altogether sure why this is needed, keeping in in case magic
 		self._x, self._y = self.x, self.y
 		self.x, self.y = x, y
 
@@ -145,20 +145,14 @@ class Entity(Tweener):
 			self.x, self.y = self._x, self._y
 		return False
 
-	# collide_into
-
-	# collide_types_into
-
-	# onCamera
-
 	world = property(lambda self:self._world)
-
+	#MISSING SOME PROPERTIES IN HERE.
+	center_x = property(lambda self:self.left+self.width/2)
+	center_y = property(lambda self:self.top+self.height/2)
 	left = property(lambda self:self.x-origin_x)
 	right = property(lambda self:self.left+self.width)
 	top = property(lambda self:self.y-self.origin_y)
 	bottom = property(lambda self:self.top+self.height)
-	center_x = property(lambda self:self.left+self.width/2)
-	center_y = property(lambda self:self.top+self.height/2)
 
 	def _set_layer(self, value):
 		if self._layer == value:
@@ -166,9 +160,9 @@ class Entity(Tweener):
 		if not self._world:
 			self._layer = value
 			return
-		self._world._remove_layer(self)
+		self._world._remove_render(self)
 		self._layer = value
-		self._world._add_layer(self)
+		self._world._add_render(self)
 	layer = property(lambda self:self._layer, _set_layer)
 
 	def _set_type(self, value):
@@ -193,7 +187,7 @@ class Entity(Tweener):
 			g.assign()
 	graphic = property(lambda self:self._graphic, _set_graphic)
 
-	def add_graphic(g):
+	def add_graphic(self, g):
 		raise NotImplementedError()
 
 	def set_hitbox(self, width=0, height=0, origin_x=0, origin_y = 0):
