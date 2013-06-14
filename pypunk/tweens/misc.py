@@ -143,7 +143,7 @@ class VarTween(Tween):
 
 
 class MultiVarTween(Tween):
-	def __init__(self, complete, _type=0):
+	def __init__(self, complete=None, _type=0):
 		self._object = None
 		self._vars = []
 		self._start = []
@@ -154,21 +154,20 @@ class MultiVarTween(Tween):
 	def tween(self, _object, values, duration, ease=None):
 		self._object = _object
 		self._vars = []
-		selg._start = []
+		self._start = []
 		self._range = []
 		self._target = duration
 		self._ease = ease
-		for k, v in values.values():
-			if not _object.hasattr(k):
+		for k, v in values.items():
+			if not hasattr(self._object, k):
 				raise PyPunkError('The Object does not have the property "' + k + '".')
 			self._vars.append(k)
-			self._start.append(float(self._object.getattr(k)))
-			self._range.append(v - self._start)
+			a = float(getattr(_object, k))
+			self._start.append(a)
+			self._range.append(v - a)
 		self.start()
 
 	def update(self):
 		super().update()
-		i = len(self._vars)
-		while i:
-			self._object.setattr(self._vars[i], self._start[i] + self.range[i] * self._t)
-			i -= 1
+		for i in range(len(self._vars)):
+			setattr(self._object, self._vars[i], self._start[i] + self._range[i] * self._t)
