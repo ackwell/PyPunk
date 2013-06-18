@@ -10,6 +10,7 @@ class World(Tweener):
 		# Public variables
 		self.visible = True
 		self.camera = Point()
+		self.engine = None
 
 		# Private variables
 		# Adding/removal

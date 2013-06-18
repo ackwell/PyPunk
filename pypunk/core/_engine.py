@@ -35,7 +35,7 @@ class Engine(object):
 
 		# Bind input and close events
 		Input._bind_events()
-		EventManager.register_event(sfml.window.CloseEvent, self.close)
+		EventManager.register_event(sfml.window.CloseEvent, self.stop)
 
 		# Set up the audio listener, etc
 		Sfx.setup_listener()
@@ -67,6 +67,9 @@ class Engine(object):
 
 		PP.screen.close()
 
+	def stop(self, event=None):
+		self._running = False
+
 	def update(self):
 		PP._world._update_lists()
 		if PP._goto:
@@ -87,9 +90,6 @@ class Engine(object):
 			PP._world.render()
 		PP.screen.display()
 
-	def close(self, event=None):
-		self._running = False
-
 	def _check_world(self):
 		if not PP._goto:
 			return
@@ -101,6 +101,7 @@ class Engine(object):
 		PP._world = PP._goto
 		PP._goto = None
 		PP.camera = PP._world.camera
+		PP._world.engine = self
 		PP._world._update_lists()
 		PP._world.begin()
 		PP._world._update_lists()
