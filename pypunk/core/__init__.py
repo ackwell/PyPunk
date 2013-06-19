@@ -5,7 +5,7 @@ main game loop.
 """
 
 # Import the other core classes
-from ._engine import Engine
+from ._engine import Engine, Screen
 from ._entity import Entity
 from ._graphics import Graphic
 from ._pp import PP
