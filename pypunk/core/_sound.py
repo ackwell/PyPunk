@@ -27,7 +27,7 @@ class Sfx(object):
 		Sfx.localize_sound(self.source)
 
 	def play(self, vol=1, pan=0, stop_on_remove=False):
-		if not self._is_stopped:
+		if not self._is_stopped():
 			self.stop()
 		# Make sure sound isn't looping (might have been looping previously)
 		self.source.loop = False
@@ -46,7 +46,7 @@ class Sfx(object):
 		self.source.loop = True
 
 	def stop(self, force=False):
-		if self._is_stopped:
+		if self._is_stopped():
 			return False
 		self._remove_playing()
 		if force:
@@ -94,7 +94,7 @@ class Sfx(object):
 		self.volume = self.volume
 		self.pan = self.pan
 
-	playing = property(lambda self: not self._is_stopped)
+	playing = property(lambda self: not self._is_stopped())
 
 	position = property(lambda self: self.source.playing_offset.seconds)
 
@@ -131,7 +131,7 @@ class Sfx(object):
 			sfx.volume = sfx.volume
 
 	def _is_stopped(self):
-		return self.source.status == sfml.audio.SoundSource.STOPPED
+		return self.source.status != sfml.audio.SoundSource.PLAYING
 
 	_listener_depth = 10
 	_base_att = 0
